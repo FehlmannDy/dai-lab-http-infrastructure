@@ -9,10 +9,9 @@ import java.util.List;
 @Service
 public class PcService {
 
-    private final PcRepository cardRepository;
+    private final PcRepository cardRepository = null;
 
-    public PcService(PcRepository cardRepository) {
-        this.cardRepository = cardRepository;
+    public PcService() {
     }
 
     public List<Pc> getAllCards() {

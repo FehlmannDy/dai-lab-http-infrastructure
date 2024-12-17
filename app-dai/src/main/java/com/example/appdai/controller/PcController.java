@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import com.example.appdai.model.Pc;
 import com.example.appdai.service.PcService;
+import org.springframework.stereotype.Controller;
 
 import javax.smartcardio.Card;
 import java.util.List;
@@ -24,9 +25,21 @@ public class PcController {
     private final Javalin app;
     private final PcService cardService;
 
-    public PcController(Javalin app, PcService cardService) {
+    public PcController(Javalin app) {
         this.app = app;
-        this.cardService = cardService;
+        this.cardService = new PcService();
+    }
+
+    // Méthode pour enregistrer les routes
+    public void registerRoutes(Javalin app) {
+        app.get("/api/coucoutoi", ctx -> ctx.result("Coucou toi!"));
+        app.get("/api/hello", ctx -> ctx.result("Hello depuis PcController!"));
+    }
+
+    // get hello from javalin
+    @PostConstruct
+    public void startJavalin() {
+        app.get("/api/coucoutoi", ctx -> ctx.result("COUCOUUUUUUUUUUUUUUUUUUU"));
     }
 
     @PostConstruct
