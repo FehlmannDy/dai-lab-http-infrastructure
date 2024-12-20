@@ -17,8 +17,30 @@ The docker image containing the static HTTP server nginx is in the [static_serve
 
 A more detailed description of the website and of the configuration of the nginx server can be found in the [static_server/README.md](static_server/README.md) file.
 
-Step 2: Docker compose
+Docker compose
 ----------
+The [docker-compose](docker-compose.yml) file can be found in the root of the project. It contains the configurations to deploy the different services of the project.
+
+The services are:
+- static_server
+- ...
+
+Commands to run the project are:
+```
+docker-compose up
+
+```
+
+To build the project:
+```
+docker-compose up -d --build 
+```
+
+
+To stop the project:
+```
+docker-compose down
+```
 
 
 Step 3: HTTP API server
