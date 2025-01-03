@@ -3,22 +3,28 @@ package com.example.appdai.service;
 import com.example.appdai.model.Pc;
 import com.example.appdai.repository.PcRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
 public class PcService {
 
-    private final PcRepository cardRepository = null;
+    private final PcRepository pcRepository;
 
-    public PcService() {
+    public PcService(PcRepository pcRepository) {
+        this.pcRepository = pcRepository;
     }
 
-    public List<Pc> getAllCards() {
-        return cardRepository.findAll();
+    // Exemple de méthode pour récupérer des données via PcRepository
+    public String getFirstRecord() {
+        return pcRepository.getFirstRecord();
     }
 
-    public void createCard(Pc card) {
-        cardRepository.save(card);
+    public List<String> getAllPcs() {
+        return pcRepository.getAllPcs();
     }
+
+    public List<Pc> getAllPcsWithType() {
+        return pcRepository.getAllPcsWithType();
+    }
+
 }

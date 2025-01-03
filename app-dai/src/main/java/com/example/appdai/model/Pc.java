@@ -1,32 +1,37 @@
 package com.example.appdai.model;
 
-import jakarta.validation.constraints.NotBlank;
-
-/*
-Le package model contient :
-
-    Les classes représentant tes données (entités ou objets métiers).
-    Les DTOs (Data Transfer Objects) pour transférer des données entre ton frontend et backend.
- */
-
-
-// CEST UN EXEMPLE DE MODEL
+// Ce serait cool de créer le modèle pour les groupes aussi, Artiste, etc
 public class Pc {
-    private Long id;
 
-    @NotBlank(message = "Card name cannot be blank")
-    private String name;
+    private int id;                 // ID unique de la carte
+    private String name;            // Nom de la carte
+    private String imageUrl;        // URL de l'image
+    private String type;            // Type de la carte (PCA, POB, etc.)
+    private boolean isActive;       // Indique si l'artiste sur la PC est actif
+    private int artistId;           // ID de l'artiste
+    private int sourceId;           // ID de la source officielle
 
-    private String description;
+    // Constructeur par défaut
+    public Pc() {
+    }
 
-    private String ownerUsername;
+    // Constructeur avec paramètres
+    public Pc(int id, String name, String imageUrl, String type, boolean isActive, int artistId, int sourceId) {
+        this.id = id;
+        this.name = name;
+        this.imageUrl = imageUrl;
+        this.type = type;
+        this.isActive = isActive;
+        this.artistId = artistId;
+        this.sourceId = sourceId;
+    }
 
-    // Getters et setters
-    public Long getId() {
+    // Getters et Setters
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -38,19 +43,57 @@ public class Pc {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
-    public String getOwnerUsername() {
-        return ownerUsername;
+    public String getType() {
+        return type;
     }
 
-    public void setOwnerUsername(String ownerUsername) {
-        this.ownerUsername = ownerUsername;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public int getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(int artistId) {
+        this.artistId = artistId;
+    }
+
+    public int getParam2() {
+        return sourceId;
+    }
+
+    public void setSourceId(int sourceId) {
+        this.sourceId = sourceId;
+    }
+
+    // Méthode toString pour l'affichage
+    @Override
+    public String toString() {
+        return "PhotoCard{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", type='" + type + '\'' +
+                ", isActive=" + isActive +
+                ", artistId=" + artistId +
+                ", sourceId=" + sourceId +
+                '}';
     }
 }

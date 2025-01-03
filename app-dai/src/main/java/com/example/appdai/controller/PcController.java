@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.smartcardio.Card;
 import java.util.List;
+import java.util.Map;
 
 /*
 Le package controller regroupe toutes les classes responsables de gérer les requêtes HTTP (les endpoints).
@@ -25,39 +26,33 @@ public class PcController {
     private final Javalin app;
     private final PcService cardService;
 
-    public PcController(Javalin app) {
+    public PcController(Javalin app, PcService service) {
         this.app = app;
-        this.cardService = new PcService();
+        this.cardService = service;
     }
 
     // Méthode pour enregistrer les routes
+    // Ce serait cool de séparer les routes get, post, etc, etc ou meme
+    // davoir une liste de route ou un délire du genre
     public void registerRoutes(Javalin app) {
-        app.get("/api/coucoutoi", ctx -> ctx.result("Coucou toi!"));
+        app.get("/api/coucoutoi", ctx -> {
+            String pcs = cardService.getFirstRecord();
+            ctx.status(200).json(Map.of("pc_name", pcs));
+        });
         app.get("/api/hello", ctx -> ctx.result("Hello depuis PcController!"));
-    }
-
-    // get hello from javalin
-    @PostConstruct
-    public void startJavalin() {
-        app.get("/api/coucoutoi", ctx -> ctx.result("COUCOUUUUUUUUUUUUUUUUUUU"));
-    }
-
-    @PostConstruct
-    public void configureRoutes() {
-        // Endpoint pour récupérer toutes les cartes
-        app.get("/api/cards", ctx -> {
-            List<Pc> cards = cardService.getAllCards();
-            ctx.json(cards);
+        app.get("/api/allcards", ctx -> {
+            List<String> allPcs = cardService.getAllPcs();
+            ctx.status(200).json(Map.of("cards", allPcs));
         });
 
-        // Endpoint pour créer une nouvelle carte
-        app.post("/api/cards", ctx -> {
-            Pc card = ctx.bodyAsClass(Pc.class);
-            cardService.createCard(card);
-            ctx.status(201).json("Card created successfully!");
+        app.get("/api/allcardswithtype", ctx -> {
+            List<Pc> allPcs = cardService.getAllPcsWithType();
+            ctx.json(allPcs); // Automatiquement converti en JSON
         });
+
     }
 }
+
 
 
 

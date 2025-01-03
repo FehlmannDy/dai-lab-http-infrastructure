@@ -14,20 +14,18 @@ Le package config est utilisé pour regrouper les classes de configuration, comm
  */
 @Configuration
 public class JavalinConfig {
+
     @Bean
     public Javalin javalin() {
         return Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> {
-                // Autorise toutes les origines (CORS ouvert) que pendant le development
+                // Autorise les calls depuis toutes les URL (CORS ouvert) que pendant le development
                 cors.addRule(CorsPluginConfig.CorsRule::anyHost);
 //                On remplacera par ça quand on aura setup le frontend
 //                cors.addRule(it -> {
-//                    it.allowHost("https://example.com", "https://trading-kpop.io");
+//                    it.allowHost("url de notre super frontend hehe");
 //                });
             });
-
-
         });
     }
-
 }
