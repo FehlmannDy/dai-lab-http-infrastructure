@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /*
 Le package repository contient :
@@ -25,6 +26,21 @@ public class PcRepository {
     public PcRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
+    public List<Map<String, Object>> getAllGroups() {
+        String query = "SELECT groups_id, groups_name FROM groups";
+        return jdbcTemplate.queryForList(query);
+    }
+
+    public List<Map<String, Object>> getArtistsByGroupName(String groupName) {
+        String query = "SELECT a.artists_id, a.stage_name, a.birth_date, a.active, a.proposed " +
+                "FROM artists a " +
+                "JOIN groups_artists ga ON a.artists_id = ga.artists_id " +
+                "JOIN groups g ON g.groups_id = ga.groups_id " +
+                "WHERE g.groups_name = ?";
+        return jdbcTemplate.queryForList(query, groupName);
+    }
+
 
     public String getFirstRecord() {
         String query = "SELECT pc_name FROM photocards LIMIT 1";

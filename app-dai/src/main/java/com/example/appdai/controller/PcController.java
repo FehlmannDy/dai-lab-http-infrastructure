@@ -39,6 +39,19 @@ public class PcController {
             String pcs = cardService.getFirstRecord();
             ctx.status(200).json(Map.of("pc_name", pcs));
         });
+
+        app.get("/api/groups", ctx -> {
+            List<Map<String, Object>> groups = cardService.getAllGroups();
+            ctx.json(groups);
+        });
+
+        app.get("/api/artists/{groupName}", ctx -> {
+            String groupName = ctx.pathParam("groupName");
+            List<Map<String, Object>> artists = cardService.getArtistsByGroupName(groupName);
+            ctx.status(200).json(Map.of("artists", artists));
+        });
+
+
         app.get("/api/hello", ctx -> ctx.result("Hello depuis PcController!"));
         app.get("/api/allcards", ctx -> {
             List<String> allPcs = cardService.getAllPcs();
@@ -47,7 +60,7 @@ public class PcController {
 
         app.get("/api/allcardswithtype", ctx -> {
             List<Pc> allPcs = cardService.getAllPcsWithType();
-            ctx.json(allPcs); // Automatiquement converti en JSON
+            ctx.json(allPcs);
         });
 
     }
