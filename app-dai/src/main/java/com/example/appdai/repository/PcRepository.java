@@ -1,6 +1,6 @@
 package com.example.appdai.repository;
 
-import com.example.appdai.model.Pc;
+import com.example.appdai.model.Photocard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -38,19 +38,19 @@ public class PcRepository {
         }
     }
 
-    public List<Pc> getAllPcsWithType() {
+    public List<Photocard> getAllPcsWithType() {
         String query = "SELECT id, pc_name, url, pc_type, proposed, artists_id, official_sources_id FROM photocards";
 
         return jdbcTemplate.query(query, (rs, rowNum) -> {
-            Pc pc = new Pc();
-            pc.setId(rs.getInt("id"));
-            pc.setName(rs.getString("pc_name"));
-            pc.setImageUrl(rs.getString("url"));
-            pc.setType(rs.getString("pc_type"));
-            pc.setActive(rs.getBoolean("proposed"));
-            pc.setArtistId(rs.getInt("artists_id"));
-            pc.setSourceId(rs.getInt("official_sources_id"));
-            return pc;
+            Photocard photocard = new Photocard();
+            photocard.setId(rs.getInt("id"));
+            photocard.setName(rs.getString("pc_name"));
+            photocard.setImageUrl(rs.getString("url"));
+            photocard.setType(rs.getString("pc_type"));
+            photocard.setActive(rs.getBoolean("proposed"));
+            photocard.setArtistId(rs.getInt("artists_id"));
+            photocard.setSourceId(rs.getInt("official_sources_id"));
+            return photocard;
         });
     }
 

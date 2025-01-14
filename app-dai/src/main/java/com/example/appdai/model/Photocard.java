@@ -1,7 +1,7 @@
 package com.example.appdai.model;
 
 // Ce serait cool de créer le modèle pour les groupes aussi, Artiste, etc
-public class Pc {
+public class Photocard {
 
     private int id;                 // ID unique de la carte
     private String name;            // Nom de la carte
@@ -12,11 +12,11 @@ public class Pc {
     private int sourceId;           // ID de la source officielle
 
     // Constructeur par défaut
-    public Pc() {
+    public Photocard() {
     }
 
     // Constructeur avec paramètres
-    public Pc(int id, String name, String imageUrl, String type, boolean isActive, int artistId, int sourceId) {
+    public Photocard(int id, String name, String imageUrl, String type, boolean isActive, int artistId, int sourceId) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;

@@ -1,13 +1,10 @@
 package com.example.appdai.controller;
 
 import io.javalin.Javalin;
-import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
-import com.example.appdai.model.Pc;
+import com.example.appdai.model.Photocard;
 import com.example.appdai.service.PcService;
-import org.springframework.stereotype.Controller;
 
-import javax.smartcardio.Card;
 import java.util.List;
 import java.util.Map;
 
@@ -46,8 +43,8 @@ public class PcController {
         });
 
         app.get("/api/allcardswithtype", ctx -> {
-            List<Pc> allPcs = cardService.getAllPcsWithType();
-            ctx.json(allPcs); // Automatiquement converti en JSON
+            List<Photocard> allPhotocards = cardService.getAllPcsWithType();
+            ctx.json(allPhotocards); // Automatiquement converti en JSON
         });
 
     }

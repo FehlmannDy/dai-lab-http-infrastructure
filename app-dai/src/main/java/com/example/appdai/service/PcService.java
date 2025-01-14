@@ -1,6 +1,6 @@
 package com.example.appdai.service;
 
-import com.example.appdai.model.Pc;
+import com.example.appdai.model.Photocard;
 import com.example.appdai.repository.PcRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -23,7 +23,7 @@ public class PcService {
         return pcRepository.getAllPcs();
     }
 
-    public List<Pc> getAllPcsWithType() {
+    public List<Photocard> getAllPcsWithType() {
         return pcRepository.getAllPcsWithType();
     }
 
