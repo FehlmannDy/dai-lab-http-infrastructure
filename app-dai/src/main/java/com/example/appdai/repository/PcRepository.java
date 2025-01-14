@@ -163,4 +163,28 @@ public class PcRepository {
     }
 
 
+    public List<Photocard> getUserWishlist(Integer userId) {
+        String query = "SELECT pc.pc_id,pc.pc_name,pc.url,pc.pc_type,pc.proposed,pc.artists_id,pc.official_sources_id\n" +
+                "FROM users_photocard_list AS upl\n" +
+                "JOIN photocards AS pc USING (pc_id)\n"+
+                "WHERE upl.users_id = ? AND upl.have = false";
+
+        try {
+            return jdbcTemplate.query(query, new Object[]{userId}, (rs, rowNum) -> {
+                Photocard photocard = new Photocard();
+                photocard.setId(rs.getInt("pc_id"));
+                photocard.setName(rs.getString("pc_name"));
+                photocard.setImageUrl(rs.getString("url"));
+                photocard.setType(rs.getString("pc_type"));
+                photocard.setActive(rs.getBoolean("proposed"));
+                photocard.setArtistId(rs.getInt("artists_id"));
+                photocard.setSourceId(rs.getInt("official_sources_id"));
+                return photocard;
+            });
+        } catch (DataAccessException e) {
+            System.err.println("Erreur lors de l'exécution de la requête : " + e.getMessage());
+            e.printStackTrace(); // Pour plus de détails sur l'erreur
+            return List.of(); // Retourne une liste vide en cas d'erreur
+        }
+    }
 }

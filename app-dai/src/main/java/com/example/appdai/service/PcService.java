@@ -44,4 +44,8 @@ public class PcService {
     public List<Artist> getGroupArtists(String groupsName) {
         return pcRepository.getGroupArtists(groupsName);
     }
+
+    public List<Photocard> getUserWishlist(Integer userId) {
+        return pcRepository.getUserWishlist(userId);
+    }
 }

@@ -78,7 +78,7 @@ public class PcController {
             }
         });
 
-        app.get("api/artists/{groupsName}",ctx->{
+        app.get("/api/artists/{groupsName}",ctx->{
             String groupsName = ctx.pathParam("groupsName");
             List<Artist> artists = cardService.getGroupArtists(groupsName);
             if (artists != null && !artists.isEmpty()) {
@@ -88,6 +88,15 @@ public class PcController {
             }
         });
 
+        app.get("/api/users/{userId}/wishlist", ctx -> {
+            Integer userId = Integer.parseInt(ctx.pathParam("userId"));
+            List<Photocard> photocards = cardService.getUserWishlist(userId);
+            if (photocards != null && !photocards.isEmpty()) {
+                ctx.status(200).json(photocards);
+            }else{
+                ctx.status(404).result("Aucune photocard en wishlist");
+            }
+        });
 
     }
 }
