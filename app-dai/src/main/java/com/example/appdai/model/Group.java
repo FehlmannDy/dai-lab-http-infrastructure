@@ -6,7 +6,7 @@ public class Group {
 
     private int groupsId;
     private String groupsName;
-    private char gender;
+    private String gender;
     private String label;
     private Date beginDate;
     private Date disbandDate;
@@ -15,7 +15,7 @@ public class Group {
     public Group() {
     }
 
-    public Group(int groupsId, String groupsName, char gender, String label, Date beginDate, Date disbandDate, boolean proposed) {
+    public Group(int groupsId, String groupsName, String gender, String label, Date beginDate, Date disbandDate, boolean proposed) {
         this.groupsId = groupsId;
         this.groupsName = groupsName;
         this.gender = gender;
@@ -41,11 +41,11 @@ public class Group {
         this.groupsName = groupsName;
     }
 
-    public char getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(char gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 

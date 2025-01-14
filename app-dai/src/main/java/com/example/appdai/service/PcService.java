@@ -1,5 +1,7 @@
 package com.example.appdai.service;
 
+import com.example.appdai.model.Artist;
+import com.example.appdai.model.Group;
 import com.example.appdai.model.Photocard;
 import com.example.appdai.repository.PcRepository;
 import org.springframework.stereotype.Service;
@@ -27,4 +29,19 @@ public class PcService {
         return pcRepository.getAllPcsWithType();
     }
 
+    public String getArtistGroup(int artistId) {
+        return pcRepository.getArtistGroup(artistId);
+    }
+
+    public List<Group> getAllGroups() {
+        return pcRepository.getAllGroups();
+    }
+
+    public List<Photocard> getPhotocardsByGroup(int groupId) {
+        return pcRepository.getPhotocardsByGroup(groupId);
+    }
+
+    public List<Artist> getGroupArtists(String groupsName) {
+        return pcRepository.getGroupArtists(groupsName);
+    }
 }
