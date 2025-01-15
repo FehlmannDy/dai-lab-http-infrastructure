@@ -61,6 +61,7 @@ public class PcController {
         });
 
         // Route pour obtenir la liste de tous les groupes (où proposed = false)
+        // TODO supprimer avec le nouveau group controller
         app.get("/api/groups", ctx -> {
             List<Group> allGroups = cardService.getAllGroups();
             ctx.status(200).json(allGroups); // Convertir la liste de groupes en JSON
