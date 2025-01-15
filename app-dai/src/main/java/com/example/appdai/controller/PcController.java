@@ -88,6 +88,7 @@ public class PcController {
             }
         });
 
+        // GET: La wishtlist du userId
         app.get("/api/users/{userId}/wishlist", ctx -> {
             Integer userId = Integer.parseInt(ctx.pathParam("userId"));
             List<Photocard> photocards = cardService.getUserWishlist(userId);
@@ -96,6 +97,23 @@ public class PcController {
             }else{
                 ctx.status(404).result("Aucune photocard en wishlist");
             }
+        });
+
+        // PATCH: Modifier un élément de la liste de souhaits (having)
+        app.patch("/api/users/{userId}/wishlist/{photocardId}", ctx -> {
+            Integer userId = Integer.parseInt(ctx.pathParam("userId"));
+            Integer photocardId = Integer.parseInt(ctx.pathParam("photocardId"));
+            Photocard updatedPhotocard = ctx.bodyAsClass(Photocard.class);
+            cardService.updateWishlist(userId, photocardId, updatedPhotocard);
+            ctx.status(200).result("Photocard mise à jour");
+        });
+
+        // DELETE: Supprimer un élément de la liste de souhaits
+        app.delete("/api/users/{userId}/wishlist/{photocardId}", ctx -> {
+            Integer userId = Integer.parseInt(ctx.pathParam("userId"));
+            Integer photocardId = Integer.parseInt(ctx.pathParam("photocardId"));
+            cardService.removeFromWishlist(userId, photocardId);
+            ctx.status(204).result("Photocard supprimée de la wishlist");
         });
 
     }
