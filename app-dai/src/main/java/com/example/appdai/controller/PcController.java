@@ -88,56 +88,6 @@ public class PcController {
             }
         });
 
-        // GET: La wishtlist du userId
-        app.get("/api/users/{userId}/wishlist", ctx -> {
-            Integer userId = Integer.parseInt(ctx.pathParam("userId"));
-            List<Photocard> photocards = cardService.getUserWishlist(userId);
-            if (photocards != null && !photocards.isEmpty()) {
-                ctx.status(200).json(photocards);
-            }else{
-                ctx.status(404).result("Aucune photocard en wishlist");
-            }
-        });
-
-        // INSERT: insert un élément de la liste de souhaits
-        app.patch("/api/users/{userId}/add/wishlist/{photocardId}", ctx -> {
-            Integer userId = Integer.parseInt(ctx.pathParam("userId"));
-            Integer photocardId = Integer.parseInt(ctx.pathParam("photocardId"));
-            Boolean have = Boolean.parseBoolean(ctx.pathParam("have"));
-            if (userId != null || photocardId != null) {
-                cardService.removeFromWishlist(userId, photocardId,have);
-                ctx.status(204).result("Photocard ajoutée à la wishlist");
-            }else{
-                ctx.status(404).result("Le user n'existe pas ou la carte n'existe pas");
-            }
-            
-        });
-
-        // PATCH: Modifier un élément de la liste de souhaits (having)
-        app.patch("/api/users/{userId}/update/wishlist/{photocardId}", ctx -> {
-            Integer userId = Integer.parseInt(ctx.pathParam("userId"));
-            Integer photocardId = Integer.parseInt(ctx.pathParam("photocardId"));
-            Photocard updatedPhotocard = ctx.bodyAsClass(Photocard.class);
-            if (userId != null || photocardId != null) {
-                cardService.updateWishlist(userId, photocardId, updatedPhotocard);
-                ctx.status(200).result("Photocard mise à jour");
-            }else{
-                ctx.status(404).result("Le user n'existe pas ou la carte n'existe pas");
-            }
-        });
-
-        // DELETE: Supprimer un élément de la liste de souhaits
-        app.delete("/api/users/{userId}/wishlist/{photocardId}", ctx -> {
-            Integer userId = Integer.parseInt(ctx.pathParam("userId"));
-            Integer photocardId = Integer.parseInt(ctx.pathParam("photocardId"));
-            if (userId != null || photocardId != null) {
-                cardService.removeFromWishlist(userId, photocardId);
-                ctx.status(204).result("Photocard supprimée de la wishlist");
-            }else{
-                ctx.status(404).result("Le user n'existe pas ou la carte n'existe pas");
-            }
-        });
-
     }
 }
 
