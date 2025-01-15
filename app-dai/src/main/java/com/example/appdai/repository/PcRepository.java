@@ -187,4 +187,29 @@ public class PcRepository {
             return List.of(); // Retourne une liste vide en cas d'erreur
         }
     }
+
+    public boolean updateWishlist(int userId, int photocardId, boolean have) {
+        String query = "UPDATE user_photocard_list SET have = ? WHERE user_id = ? AND photocard_id = ?";
+    
+        try {
+            int updatedRows = jdbcTemplate.update(query, have, userId, photocardId);
+            return updatedRows > 0;
+        } catch (DataAccessException e) {
+            System.err.println("Erreur lors de la mise à jour de la wishlist : " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean deleteFromWishlist(int userId, int photocardId) {
+        String query = "DELETE FROM user_photocard_list WHERE user_id = ? AND photocard_id = ?";
+    
+        try {
+            int deletedRows = jdbcTemplate.update(query, userId, photocardId);
+            return deletedRows > 0; // Retourne true si au moins une ligne a été supprimée
+        } catch (DataAccessException e) {
+            System.err.println("Erreur lors de la suppression de la photocard de la wishlist : " + e.getMessage());
+            return false;
+        }
+    }
+    
 }
