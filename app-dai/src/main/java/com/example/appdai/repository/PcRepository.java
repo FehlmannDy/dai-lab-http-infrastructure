@@ -200,6 +200,18 @@ public class PcRepository {
         }
     }
 
+    public boolean addToWishlist(int userId, int photocardId, boolean have) {
+        String query = "INSERT INTO user_photocard_list (user_id, photocard_id, have) VALUES (?, ?, ?)";
+
+        try {
+            int insertedRows = jdbcTemplate.update(query, userId, photocardId,have);
+            return insertedRows > 0; // Retourne true si au moins une ligne a été insérée
+        } catch (DataAccessException e) {
+            System.err.println("Erreur lors de l'ajout de la photocard à la wishlist : " + e.getMessage());
+            return false;
+        }
+    }
+
     public boolean deleteFromWishlist(int userId, int photocardId) {
         String query = "DELETE FROM user_photocard_list WHERE user_id = ? AND photocard_id = ?";
     
