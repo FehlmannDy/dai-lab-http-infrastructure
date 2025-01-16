@@ -88,24 +88,6 @@ public class PcRepository {
         }
     }
 
-    public List<Group> getAllGroups(){
-        String query = "SELECT * FROM groups";
-        try {
-            return jdbcTemplate.query(query, (rs, rowNum) -> {
-                Group group = new Group();
-                group.setGroupsId(rs.getInt("groups_id"));
-                group.setGroupsName(rs.getString("groups_name"));
-                group.setLabel(rs.getString("label"));
-                group.setBeginDate(rs.getDate("begin_date"));
-                group.setGender(rs.getString("gender"));
-                return group;
-            });
-        } catch (Exception e) {
-            System.err.println("Erreur lors de la requête : " + e.getMessage());
-            return List.of(); // Retourne une liste vide en cas d'erreur
-        }
-    }
-
     public List<Photocard> getPhotocardsByGroup(int groupId) {
         String query = "SELECT * FROM photocards_for_group WHERE groups_id = ?";
         try {
