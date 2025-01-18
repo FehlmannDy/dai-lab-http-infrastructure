@@ -15,6 +15,14 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public void addOrUpdatePhotocard(int userId, int photocardId, boolean have) {
+        userRepository.addOrUpdatePhotocard(userId, photocardId, have);
+    }
+
+    public void removeFromUserlist(int userId, int photocardId) {
+        userRepository.deletePcFromUserList(userId, photocardId);
+    }
+
     public List<Map<String, Object>> getUserWishlist(int userId) {
         return userRepository.getUserWishlist(userId);
     }
@@ -22,4 +30,6 @@ public class UserService {
     public List<Map<String, Object>> getUserCollection(int userId) {
         return userRepository.getUserCollection(userId);
     }
+
+
 }

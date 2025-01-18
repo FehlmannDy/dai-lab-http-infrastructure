@@ -10,6 +10,7 @@ import com.example.appdai.service.PcService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /*
 Le package controller regroupe toutes les classes responsables de gérer les requêtes HTTP (les endpoints).
@@ -32,9 +33,40 @@ public class UserController {
 
     public void registerRoutes(Javalin app) {
 
+        // Add or update a photocard in the wishlist/collection
+        app.post("/api/users/{userId}/photocards", ctx -> {
+            int userId = Integer.parseInt(ctx.pathParam("userId"));
+            int photocardId = Integer.parseInt(Objects.requireNonNull(ctx.formParam("photocardId")));
+            String haveStr = ctx.formParam("have");
+
+            if (!"true".equalsIgnoreCase(haveStr) && !"false".equalsIgnoreCase(haveStr)) {
+                ctx.status(400).result("Invalid value for 'have'. Must be 'true' or 'false'.");
+                return;
+            }
+
+            boolean have = Boolean.parseBoolean(haveStr);
+
+            try {
+                userService.addOrUpdatePhotocard(userId, photocardId, have);
+                ctx.status(201);
+            } catch (RuntimeException e) {
+                ctx.status(400).result(e.getMessage());
+            }
+        });
+
+        // Delete a photocard from the wishlist/collection
+        app.delete("/api/users/{userId}/photocards/{photocardId}", ctx -> {
+            int userId = Integer.parseInt(ctx.pathParam("userId"));
+            int photocardId = Integer.parseInt(ctx.pathParam("photocardId"));
+            userService.removeFromUserlist(userId, photocardId);
+            ctx.status(204).result("Photocard removed from user list");
+        });
+
+
+
         // Get the wishlist of a user by userId
         app.get("/api/users/{userId}/wishlist", ctx -> {
-            Integer userId = Integer.parseInt(ctx.pathParam("userId"));
+            int userId = Integer.parseInt(ctx.pathParam("userId"));
             List<Map<String, Object>> photocards = userService.getUserWishlist(userId);
             if (photocards != null && !photocards.isEmpty()) {
                 ctx.status(200).json(photocards);
@@ -45,7 +77,7 @@ public class UserController {
 
         // Get the collection of a user by userId
         app.get("/api/users/{userId}/collection", ctx -> {
-            Integer userId = Integer.parseInt(ctx.pathParam("userId"));
+            int userId = Integer.parseInt(ctx.pathParam("userId"));
             List<Map<String, Object>> photocards = userService.getUserCollection(userId);
             if (photocards != null && !photocards.isEmpty()) {
                 ctx.status(200).json(photocards);
@@ -53,6 +85,8 @@ public class UserController {
                 ctx.status(404).result("No photocards in user collection");
             }
         });
+
+
 
 //
 //        // INSERT: insert un élément de la liste de souhaits
@@ -82,17 +116,7 @@ public class UserController {
 //            }
 //        });
 //
-//        // DELETE: Supprimer un élément de la liste de souhaits
-//        app.delete("/api/users/{userId}/wishlist/{photocardId}", ctx -> {
-//            Integer userId = Integer.parseInt(ctx.pathParam("userId"));
-//            Integer photocardId = Integer.parseInt(ctx.pathParam("photocardId"));
-//            if (userId != null || photocardId != null) {
-//                userService.removeFromWishlist(userId, photocardId);
-//                ctx.status(204).result("Photocard supprimée de la wishlist");
-//            }else{
-//                ctx.status(404).result("Le user n'existe pas ou la carte n'existe pas");
-//            }
-//        });
+
     }
 
 }

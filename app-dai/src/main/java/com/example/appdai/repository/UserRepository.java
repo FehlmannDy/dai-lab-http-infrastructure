@@ -10,6 +10,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +35,47 @@ public class UserRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    public void addOrUpdatePhotocard(int userId, int photocardId, boolean have) {
+        String query = "INSERT INTO users_photocard_list (user_id, pc_id, have) VALUES (?, ?, ?)";
+
+        try {
+            jdbcTemplate.update(connection -> {
+                PreparedStatement stmt = connection.prepareStatement(query);
+                stmt.setInt(1, userId);
+                stmt.setInt(2, photocardId);
+                stmt.setBoolean(3, have);
+                return stmt;
+            });
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error while adding/updating photocard to user list: " + e.getMessage());
+        }
+    }
+
+
+    public void deletePcFromUserList(int userId, int photocardId) {
+        String query = "DELETE FROM users_photocard_list WHERE users_id = ? AND pc_id = ?";
+
+        try {
+            int rowsAffected = jdbcTemplate.update(conn -> {
+                PreparedStatement stmt = conn.prepareStatement(query);
+                stmt.setInt(1, userId);
+                stmt.setInt(2, photocardId);
+                return stmt;
+            });
+
+            if (rowsAffected == 0) {
+                throw new RuntimeException("No photocard found or deleted for this user");
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error while deleting photocard from user list: " + e.getMessage());
+        }
+    }
+
     public List<Map<String, Object>> getUserWishlist(int userId) {
         String query = "SELECT p.pc_id, p.pc_name " +
                 "FROM users_photocard_list upl " +
                 "JOIN photocards p ON upl.pc_id = p.pc_id " +
-                "WHERE upl.user_id = ? AND upl.have = FALSE";
+                "WHERE upl.users_id = ? AND upl.have = FALSE";
 
         try {
             return jdbcTemplate.query(query, new Object[]{userId}, (rs, rowNum) -> {
@@ -56,7 +94,7 @@ public class UserRepository {
         String query = "SELECT p.pc_id, p.pc_name " +
                 "FROM users_photocard_list upl " +
                 "JOIN photocards p ON upl.pc_id = p.pc_id " +
-                "WHERE upl.user_id = ? AND upl.have = TRUE";
+                "WHERE upl.users_id = ? AND upl.have = TRUE";
 
         try {
             return jdbcTemplate.query(query, new Object[]{userId}, (rs, rowNum) -> {
@@ -70,6 +108,8 @@ public class UserRepository {
             return List.of();
         }
     }
+
+
 //
 //    public boolean updateWishlist(int userId, int photocardId, boolean have) {
 //        String query = "UPDATE user_photocard_list SET have = ? WHERE user_id = ? AND photocard_id = ?";
@@ -83,17 +123,7 @@ public class UserRepository {
 //        }
 //    }
 //
-//    public boolean addToWishlist(int userId, int photocardId, boolean have) {
-//        String query = "INSERT INTO user_photocard_list (user_id, photocard_id, have) VALUES (?, ?, ?)";
-//
-//        try {
-//            int insertedRows = jdbcTemplate.update(query, userId, photocardId,have);
-//            return insertedRows > 0; // Retourne true si au moins une ligne a été insérée
-//        } catch (DataAccessException e) {
-//            System.err.println("Erreur lors de l'ajout de la photocard à la wishlist : " + e.getMessage());
-//            return false;
-//        }
-//    }
+
 
     public boolean deleteFromWishlist(int userId, int photocardId) {
         String query = "DELETE FROM user_photocard_list WHERE user_id = ? AND photocard_id = ?";
