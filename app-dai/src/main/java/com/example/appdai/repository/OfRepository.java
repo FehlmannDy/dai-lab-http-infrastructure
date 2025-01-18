@@ -52,10 +52,10 @@ public class OfRepository {
 //    }
 
     public boolean addSource(OfficialSource officialSource){
-        String query = "INSERT INTO official_sources (title,version_name,shop_name,release_date,type) VALUES (?,?,?,?,?)";
+        String query = "INSERT INTO official_sources (title,version_name,release_date,type) VALUES (?,?,?,?)";
 
         try{
-            int insertRows = jdbcTemplate.update(query,officialSource.getTitle(),officialSource.getVersionName(),officialSource.getShopName(),officialSource.getType());
+            int insertRows = jdbcTemplate.update(query,officialSource.getTitle(),officialSource.getVersionName(), officialSource.getReleaseDate(), officialSource.getType());
             return insertRows > 0;
 
         }catch(DataAccessException e){

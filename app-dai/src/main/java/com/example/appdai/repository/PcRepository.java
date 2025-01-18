@@ -2,6 +2,7 @@ package com.example.appdai.repository;
 
 import com.example.appdai.model.Artist;
 import com.example.appdai.model.Group;
+import com.example.appdai.model.PC_type;
 import com.example.appdai.model.Photocard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -38,9 +39,9 @@ public class PcRepository {
                 Photocard photocard = new Photocard();
                 photocard.setId(rs.getInt("photocard_id"));
                 photocard.setName(rs.getString("pc_name"));
+                photocard.setShopName(rs.getString("shop_name"));
                 photocard.setImageUrl(rs.getString("url"));
-                photocard.setType(rs.getString("pc_type_enum"));
-                photocard.setActive(true);
+                photocard.setType(PC_type.valueOf(rs.getString("pc_type")));
                 photocard.setArtistId(rs.getInt("artists_id"));
                 photocard.setSourceId(rs.getInt("official_sources_id"));
                 return photocard;
@@ -85,9 +86,9 @@ public class PcRepository {
                 Photocard photocard = new Photocard();
                 photocard.setId(rs.getInt("photocard_id"));
                 photocard.setName(rs.getString("pc_name"));
+                photocard.setShopName(rs.getString("shop_name"));
                 photocard.setImageUrl(rs.getString("url"));
-                photocard.setType(rs.getString("pc_type"));
-                photocard.setActive(rs.getBoolean("proposed"));
+                photocard.setType(PC_type.valueOf(rs.getString("pc_type")));
                 photocard.setArtistId(rs.getInt("artists_id"));
                 photocard.setSourceId(rs.getInt("official_sources_id"));
                 return photocard;

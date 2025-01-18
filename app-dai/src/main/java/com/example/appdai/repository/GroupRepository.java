@@ -84,7 +84,6 @@ public class GroupRepository {
                 Group group = new Group();
                 group.setGroupsId(rs.getInt("groups_id"));
                 group.setGroupsName(rs.getString("groups_name"));
-                group.setLabel(rs.getString("label"));
                 group.setBeginDate(rs.getDate("begin_date"));
                 group.setGender(rs.getString("gender"));
                 return group;
