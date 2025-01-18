@@ -33,11 +33,13 @@ public class GroupService {
         return groupRepository.getArtistsByGroupId(groupId);
     }
 
-    public List<Group> getAllGroups() {
-        return groupRepository.getAllGroups();
-    }
 
-    public List<Artist> getGroupArtists(String groupsName) {
-        return groupRepository.getGroupArtists(groupsName);
-    }
+    // A voir si on garde ou pas ou dans quelles conditions
+//    public List<Group> getAllGroups() {
+//        return groupRepository.getAllGroups();
+//    }
+//
+//    public List<Artist> getGroupArtists(String groupsName) {
+//        return groupRepository.getGroupArtists(groupsName);
+//    }
 }

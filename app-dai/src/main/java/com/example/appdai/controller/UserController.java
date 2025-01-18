@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.example.appdai.model.Photocard;
 import com.example.appdai.service.PcService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -85,6 +86,35 @@ public class UserController {
                 ctx.status(404).result("No photocards in user collection");
             }
         });
+
+        // Accept proposed photocards
+        app.patch("/api/admin/accept", ctx -> {
+            Map<String, Object> body = ctx.bodyAsClass(Map.class);
+            List<Integer> photocardIds = (List<Integer>) body.get("photocardIds");
+
+            if (photocardIds == null || photocardIds.isEmpty()) {
+                ctx.status(400).result("Photocard IDs list cannot be null or empty");
+                return;
+            }
+
+            userService.acceptProposedPhotocard(photocardIds);
+            ctx.status(200).result("Proposed photocards accepted");
+        });
+
+        // Reject proposed photocards
+        app.patch("/api/admin/reject", ctx -> {
+            Map<String, Object> body = ctx.bodyAsClass(Map.class);
+            List<Integer> photocardIds = (List<Integer>) body.get("photocardIds");
+
+            if (photocardIds == null || photocardIds.isEmpty()) {
+                ctx.status(400).result("Photocard IDs list cannot be null or empty");
+                return;
+            }
+
+            userService.rejectProposedPhotocard(photocardIds);
+            ctx.status(200).result("Proposed photocards rejected");
+        });
+
 
 
 

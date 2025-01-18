@@ -15,6 +15,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    // ------------------- USER -------------------
+
     public void addOrUpdatePhotocard(int userId, int photocardId, boolean have) {
         userRepository.addOrUpdatePhotocard(userId, photocardId, have);
     }
@@ -29,6 +31,16 @@ public class UserService {
 
     public List<Map<String, Object>> getUserCollection(int userId) {
         return userRepository.getUserCollection(userId);
+    }
+
+    // ------------------- ADMIN -------------------
+
+    public void acceptProposedPhotocard(List<Integer> photocardIds) {
+        userRepository.acceptProposedPhotocard(photocardIds);
+    }
+
+    public void rejectProposedPhotocard(List<Integer> photocardIds) {
+        userRepository.rejectProposedPhotocard(photocardIds);
     }
 
 

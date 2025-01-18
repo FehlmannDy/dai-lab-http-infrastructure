@@ -40,6 +40,11 @@ public class PcController {
             ctx.status(200).json(Map.of("cards", allPcs));
         });
 
+        app.get("/api/proposedphotocards", ctx -> {
+            List<Photocard> proposedPhotocards = cardService.getProposedPhotocards();
+            ctx.json(proposedPhotocards);
+        });
+
         app.get("/api/allcardswithtype", ctx -> {
             List<Photocard> allPhotocards = cardService.getAllPcsWithType();
             ctx.json(allPhotocards); // Automatiquement converti en JSON

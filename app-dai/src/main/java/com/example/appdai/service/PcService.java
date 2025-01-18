@@ -6,6 +6,7 @@ import com.example.appdai.model.Photocard;
 import com.example.appdai.repository.PcRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PcService {
@@ -14,6 +15,10 @@ public class PcService {
 
     public PcService(PcRepository pcRepository) {
         this.pcRepository = pcRepository;
+    }
+
+    public List<Photocard> getProposedPhotocards() {
+        return pcRepository.getProposedPhotocards();
     }
 
     public List<String> getAllPcs() {
@@ -32,9 +37,4 @@ public class PcService {
         return pcRepository.getPhotocardsByGroup(groupId);
     }
 
-//
-//
-//    public List<Photocard> getUserWishlist(Integer userId) {
-//        return pcRepository.getUserWishlist(userId);
-//    }
 }

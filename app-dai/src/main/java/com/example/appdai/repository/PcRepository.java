@@ -11,7 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
 Le package repository contient :
@@ -30,6 +32,27 @@ public class PcRepository {
     @Autowired
     public PcRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    // Avoir une vue peut etre ici car on aimerait pas retourner le artist id et source id mais les noms associés
+    // genre une vue qui retourne pc_id, pc_name, shop_name, image_url, type, artist_name, source_name
+    // ou une vue qui fait ça mais qui retourne deja les proposed photocards en plus
+    public List<Photocard> getProposedPhotocards() {
+        String query = "SELECT pc_id, pc_name, shop_name, url, pc_type, artists_id, official_sources_id FROM photocards WHERE proposed = TRUE";
+
+        try {
+            return jdbcTemplate.query(query, (rs, rowNum) -> new Photocard(
+                    rs.getInt("pc_id"),
+                    rs.getString("pc_name"),
+                    rs.getString("shop_name"),
+                    rs.getString("url"),
+                    PC_type.valueOf(rs.getString("pc_type")),
+                    rs.getInt("artists_id"),
+                    rs.getInt("official_sources_id")
+            ));
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error while getting proposed photocards: " + e.getMessage());
+        }
     }
 
     public List<Photocard> getAllPcsWithType() {
