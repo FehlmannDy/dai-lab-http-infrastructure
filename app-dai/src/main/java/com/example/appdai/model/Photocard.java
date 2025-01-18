@@ -1,97 +1,124 @@
+/**
+ * Photocard Class
+ * This class is used to create Photocard objects
+ * A Photocard is composed of an ID, a name, a shopName, an image URL, a type, an artist ID and a source ID
+ * The proposed status is used to know if the artist is proposed by a user or not.
+ */
 package com.example.appdai.model;
 
-// Ce serait cool de créer le modèle pour les groupes aussi, Artiste, etc
+/**
+ * PC_type Enum
+ * This enum is used to represent the type of Photocard.
+ * A Photocard can be :
+ * - PCA : Photocard from an album
+ * - POB : Photocard from a pre-order benefit or a lucky draw
+ * - PCO : Photocard from an official source
+ * - PCE : Photocard from an event
+ */
+enum PC_type {
+    PCA,
+    POB,
+    PCO,
+    PCE
+}
+
 public class Photocard {
 
     private int id;                 // ID unique de la carte
     private String name;            // Nom de la carte
+    private String shopName;        // if not null = Benefit
     private String imageUrl;        // URL de l'image
-    private String type;            // Type de la carte (PCA, POB, etc.)
-    private boolean isActive;       // Indique si l'artiste sur la PC est actif
-    private int artistId;           // ID de l'artiste
-    private int sourceId;           // ID de la source officielle
+    private PC_type type;            // Type de la carte (PCA, POB, etc.)
+    private int artistId;           // ID de l'artiste (FK)
+    private int sourceId;           // ID de la source officielle (FK)
+    private boolean proposed;       // Indique si la carte est proposée
 
-    // Constructeur par défaut
+
+    /**
+     * Default Constructor
+     */
     public Photocard() {
     }
 
-    // Constructeur avec paramètres
-    public Photocard(int id, String name, String imageUrl, String type, boolean isActive, int artistId, int sourceId) {
+    /**
+     * Constructor without shopName
+     * @param id ID of the Photocard
+     * @param name Name of the Photocard
+     * @param imageUrl Image URL of the Photocard
+     * @param type Type of the Photocard
+     * @param artistId ID of the artist (FK)
+     * @param sourceId ID of the official source (FK)
+     */
+    public Photocard(int id, String name, String imageUrl, PC_type type, int artistId, int sourceId) {
         this.id = id;
         this.name = name;
+        this.shopName = null;
         this.imageUrl = imageUrl;
         this.type = type;
-        this.isActive = isActive;
         this.artistId = artistId;
         this.sourceId = sourceId;
+        this.proposed = true;
+    }
+
+    /**
+     * Constructor with shopName
+     * @param id ID of the Photocard
+     * @param name Name of the Photocard
+     * @param shopName Shop name of the Photocard
+     * @param imageUrl Image URL of the Photocard
+     * @param type Type of the Photocard
+     * @param artistId ID of the artist (FK)
+     * @param sourceId ID of the official source (FK)
+     */
+    public Photocard(int id, String name, String shopName, String imageUrl, PC_type type, int artistId, int sourceId) {
+        this.id = id;
+        this.name = name;
+        this.shopName = shopName;
+        this.imageUrl = imageUrl;
+        this.type = type;
+        this.artistId = artistId;
+        this.sourceId = sourceId;
+        this.proposed = true;
     }
 
     // Getters et Setters
-    public int getId() {
-        return id;
-    }
+    public int getId() {return id;}
+    public void setId(int id) {this.id = id;}
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getName() {return name;}
+    public void setName(String name) {this.name = name;}
 
-    public String getName() {
-        return name;
-    }
+    public String getShopName() {return shopName;}
+    public void setShopName(String shopName) {this.shopName = shopName;}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getImageUrl() {return imageUrl;}
+    public void setImageUrl(String imageUrl) {this.imageUrl = imageUrl;}
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
+    public PC_type getType() {return type;}
+    public void setType(PC_type type) {this.type = type;}
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
+    public int getArtistId() {return artistId;}
+    public void setArtistId(int artistId) {this.artistId = artistId;}
 
-    public String getType() {
-        return type;
-    }
+    public int getSourceId() {return sourceId;}
+    public void setSourceId(int sourceId) {this.sourceId = sourceId;}
 
-    public void setType(String type) {
-        this.type = type;
-    }
+    public boolean isProposed() {return proposed;}
+    public void setProposed(boolean proposed) {this.proposed = proposed;}
 
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    public int getArtistId() {
-        return artistId;
-    }
-
-    public void setArtistId(int artistId) {
-        this.artistId = artistId;
-    }
-
-    public int getParam2() {
-        return sourceId;
-    }
-
-    public void setSourceId(int sourceId) {
-        this.sourceId = sourceId;
-    }
-
-    // Méthode toString pour l'affichage
+    /**
+     * toString Method
+     * This method is used to display the Photocard object
+     * @return String
+     */
     @Override
     public String toString() {
         return "PhotoCard{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", shopName='" + shopName + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", type='" + type + '\'' +
-                ", isActive=" + isActive +
                 ", artistId=" + artistId +
                 ", sourceId=" + sourceId +
                 '}';
