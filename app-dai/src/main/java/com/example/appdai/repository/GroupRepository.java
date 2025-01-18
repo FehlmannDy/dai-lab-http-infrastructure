@@ -36,11 +36,6 @@ public class GroupRepository {
     public GroupRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-//
-//    public List<String> getAllGroupNames() {
-//        String query = "SELECT groups_name FROM groups";
-//        return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("groups_name"));
-//    }
 
 //    public List<Map<String, Object>> searchGroupsByName(String name) {
 //        String query = "SELECT groups_id, groups_name FROM groups WHERE groups_name LIKE ?";

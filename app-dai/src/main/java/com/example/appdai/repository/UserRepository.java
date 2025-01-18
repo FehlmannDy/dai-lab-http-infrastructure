@@ -53,7 +53,7 @@ public class UserRepository {
 
 
     public void deletePcFromUserList(int userId, int photocardId) {
-        String query = "DELETE FROM users_photocard_list WHERE users_id = ? AND pc_id = ?";
+        String query = "DELETE FROM users_photocard_list WHERE user_id = ? AND pc_id = ?";
 
         try {
             int rowsAffected = jdbcTemplate.update(conn -> {
@@ -71,11 +71,13 @@ public class UserRepository {
         }
     }
 
+
+
     public List<Map<String, Object>> getUserWishlist(int userId) {
         String query = "SELECT p.pc_id, p.pc_name " +
                 "FROM users_photocard_list upl " +
                 "JOIN photocards p ON upl.pc_id = p.pc_id " +
-                "WHERE upl.users_id = ? AND upl.have = FALSE";
+                "WHERE upl.user_id = ? AND upl.have = FALSE";
 
         try {
             return jdbcTemplate.query(query, new Object[]{userId}, (rs, rowNum) -> {
@@ -94,7 +96,7 @@ public class UserRepository {
         String query = "SELECT p.pc_id, p.pc_name " +
                 "FROM users_photocard_list upl " +
                 "JOIN photocards p ON upl.pc_id = p.pc_id " +
-                "WHERE upl.users_id = ? AND upl.have = TRUE";
+                "WHERE upl.user_id = ? AND upl.have = TRUE";
 
         try {
             return jdbcTemplate.query(query, new Object[]{userId}, (rs, rowNum) -> {
@@ -124,16 +126,4 @@ public class UserRepository {
 //    }
 //
 
-
-    public boolean deleteFromWishlist(int userId, int photocardId) {
-        String query = "DELETE FROM user_photocard_list WHERE user_id = ? AND photocard_id = ?";
-    
-        try {
-            int deletedRows = jdbcTemplate.update(query, userId, photocardId);
-            return deletedRows > 0; // Retourne true si au moins une ligne a été supprimée
-        } catch (DataAccessException e) {
-            System.err.println("Erreur lors de la suppression de la photocard de la wishlist : " + e.getMessage());
-            return false;
-        }
-    }
 }
