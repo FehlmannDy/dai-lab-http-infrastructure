@@ -16,11 +16,6 @@ public class PcService {
         this.pcRepository = pcRepository;
     }
 
-    // Exemple de méthode pour récupérer des données via PcRepository
-    public String getFirstRecord() {
-        return pcRepository.getFirstRecord();
-    }
-
     public List<String> getAllPcs() {
         return pcRepository.getAllPcs();
     }
@@ -33,19 +28,13 @@ public class PcService {
         return pcRepository.getArtistGroup(artistId);
     }
 
-    public List<Group> getAllGroups() {
-        return pcRepository.getAllGroups();
-    }
-
     public List<Photocard> getPhotocardsByGroup(int groupId) {
         return pcRepository.getPhotocardsByGroup(groupId);
     }
 
-    public List<Artist> getGroupArtists(String groupsName) {
-        return pcRepository.getGroupArtists(groupsName);
-    }
-
-    public List<Photocard> getUserWishlist(Integer userId) {
-        return pcRepository.getUserWishlist(userId);
-    }
+//
+//
+//    public List<Photocard> getUserWishlist(Integer userId) {
+//        return pcRepository.getUserWishlist(userId);
+//    }
 }

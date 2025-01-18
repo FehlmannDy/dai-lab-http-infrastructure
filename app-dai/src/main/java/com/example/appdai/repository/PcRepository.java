@@ -9,6 +9,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 
 /*
@@ -28,18 +29,6 @@ public class PcRepository {
     @Autowired
     public PcRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-    }
-
-    public String getFirstRecord() {
-        String query = "SELECT pc_name FROM photocards LIMIT 1";
-
-        try {
-            String result = jdbcTemplate.queryForObject(query, String.class);
-            return result != null ? result : "Aucune donnée trouvée";
-        } catch (Exception e) {
-            System.err.println("Erreur lors de la requête : " + e.getMessage());
-            return "Erreur lors de la requête";
-        }
     }
 
     public List<Photocard> getAllPcsWithType() {
@@ -63,19 +52,20 @@ public class PcRepository {
     }
 
     public List<String> getAllPcs() {
-        String query = "SELECT pc_name FROM all_photocards";
+        String query = "SELECT pc_name FROM photocards WHERE pc_id < 15";
         try {
             return jdbcTemplate.queryForList(query, String.class);
         } catch (Exception e) {
-            System.err.println("Erreur lors de la rereturn jdbcTemplate.queryForList(query, Group.class);quête : " + e.getMessage());
+            System.err.println("Erreur lors de la return jdbcTemplate.queryForList(query, Group.class);quête : " + e.getMessage());
             return List.of(); // Retourne une liste vide en cas d'erreur
         }
     }
 
     public String getArtistGroup(int artistId) {
+
         String query = "SELECT g.groups_name " +
                 "FROM groups g " +
-                "WHERE g.groups_id = (SELECT ga.grooups_id FROM groups_artists ga WHERE ga.artists_id = ?)";
+                "WHERE g.groups_id = (SELECT ga.groups_id FROM groups_artists ga WHERE ga.artists_id = ?)";
 
         try {
             return jdbcTemplate.queryForObject(query, new Object[]{artistId}, String.class);
@@ -107,41 +97,4 @@ public class PcRepository {
             return List.of(); // Retourne une liste vide en cas d'erreur
         }
     }
-
-    public List<Artist> getGroupArtists(String groupsName) {
-        String query = "SELECT\n" +
-                "    g.groups_id,\n" +
-                "    g.groups_name,\n" +
-                "    g.gender,\n" +
-                "    g.begin_date,\n" +
-                "    g.disband_date,\n" +
-                "    a.artists_id AS artist_id,\n" +
-                "    a.stage_name,\n" +
-                "    a.birth_date,\n" +
-                "    a.active\n" +
-                "FROM\n" +
-                "    groups g\n" +
-                "JOIN\n" +
-                "    groups_artists ga ON g.groups_id = ga.groups_id\n" +
-                "JOIN\n" +
-                "    artists a ON a.artists_id = ga.artists_id\n" +
-                "WHERE\n" +
-                "    g.groups_name = ?";
-
-        try {
-            return jdbcTemplate.query(query, new Object[]{groupsName}, (rs, rowNum) -> {
-                Artist artist = new Artist();
-                artist.setArtistsId(rs.getInt("artist_id"));
-                artist.setStageName(rs.getString("stage_name"));
-                artist.setBirthDate(rs.getDate("birth_date"));
-                artist.setActive(rs.getBoolean("active"));
-                return artist;
-            });
-        } catch (DataAccessException e) {
-            System.err.println("Erreur lors de l'exécution de la requête : " + e.getMessage());
-            e.printStackTrace(); // Pour plus de détails sur l'erreur
-            return List.of(); // Retourne une liste vide en cas d'erreur
-        }
-    }
-    
 }

@@ -34,10 +34,6 @@ public class PcController {
     // Ce serait cool de séparer les routes get, post, etc, etc ou meme
     // davoir une liste de route ou un délire du genre
     public void registerRoutes(Javalin app) {
-        app.get("/api/coucoutoi", ctx -> {
-            String pcs = cardService.getFirstRecord();
-            ctx.status(200).json(Map.of("pc_name", pcs));
-        });
         app.get("/api/hello", ctx -> ctx.result("Hello depuis PcController!"));
         app.get("/api/allcards", ctx -> {
             List<String> allPcs = cardService.getAllPcs();
@@ -60,13 +56,6 @@ public class PcController {
             }
         });
 
-        // Route pour obtenir la liste de tous les groupes (où proposed = false)
-        // TODO supprimer avec le nouveau group controller
-        app.get("/api/groups", ctx -> {
-            List<Group> allGroups = cardService.getAllGroups();
-            ctx.status(200).json(allGroups); // Convertir la liste de groupes en JSON
-        });
-
         // Route pour obtenir les photocards par ID de groupe
         app.get("/api/groups/{groupId}/photocards", ctx -> {
             int groupId = Integer.parseInt(ctx.pathParam("groupId")); // Récupère l'ID du groupe depuis l'URL
@@ -79,15 +68,15 @@ public class PcController {
             }
         });
 
-        app.get("/api/artists/{groupsName}",ctx->{
-            String groupsName = ctx.pathParam("groupsName");
-            List<Artist> artists = cardService.getGroupArtists(groupsName);
-            if (artists != null && !artists.isEmpty()) {
-                ctx.status(200).json(artists);
-            } else {
-                ctx.status(404).result("Aucune photocard trouvée pour ce groupe");
-            }
-        });
+//        app.get("/api/artists/{groupsName}",ctx->{
+//            String groupsName = ctx.pathParam("groupsName");
+//            List<Artist> artists = cardService.getGroupArtists(groupsName);
+//            if (artists != null && !artists.isEmpty()) {
+//                ctx.status(200).json(artists);
+//            } else {
+//                ctx.status(404).result("Aucune photocard trouvée pour ce groupe");
+//            }
+//        });
 
     }
 }

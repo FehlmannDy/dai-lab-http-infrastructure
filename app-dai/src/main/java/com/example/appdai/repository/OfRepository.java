@@ -3,6 +3,7 @@ package com.example.appdai.repository;
 import com.example.appdai.model.Artist;
 import com.example.appdai.model.Group;
 import com.example.appdai.model.OfficialSource;
+import com.example.appdai.model.OfficialSource.*;
 import com.example.appdai.model.Photocard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -30,25 +31,25 @@ public class OfRepository {
     public OfRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
-    public List<OfficialSource> getAllSources(){
-        String query = "SELECT * FROM official_sources WHERE proposed = false";
-
-        try{
-            return jdbcTemplate.query(query,(rs, rowNum)->{
-                OffcialSource officialsource = new OffcialSource();
-                officialsource.setId(rs.getInt("officialSource_id"));
-                officialsource.setTitle(rs.getString("title"));
-                officialsource.setVersionName(rs.getString("versionName"));
-                officialsource.setShopName(rs.getString("shopName"));
-                officialsource.setType(rs.getType("type"));
-            });
-
-        }catch (Exception e){
-            System.err.println("Erreur lors de la requête : "+e.getMessage());
-            return List.of();
-        }
-    }
+//
+//    public List<OfficialSource> getAllSources(){
+//        String query = "SELECT * FROM official_sources WHERE proposed = false";
+//
+//        try{
+//            return jdbcTemplate.query(query,(rs, rowNum)->{
+//                OffcialSource officialsource = new OffcialSource();
+//                officialsource.setId(rs.getInt("officialSource_id"));
+//                officialsource.setTitle(rs.getString("title"));
+//                officialsource.setVersionName(rs.getString("versionName"));
+//                officialsource.setShopName(rs.getString("shopName"));
+//                officialsource.setType(rs.getType("type"));
+//            });
+//
+//        }catch (Exception e){
+//            System.err.println("Erreur lors de la requête : "+e.getMessage());
+//            return List.of();
+//        }
+//    }
 
     public boolean addSource(OfficialSource officialSource){
         String query = "INSERT INTO official_sources (title,version_name,shop_name,release_date,type) VALUES (?,?,?,?,?)";

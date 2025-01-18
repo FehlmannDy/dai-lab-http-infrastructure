@@ -10,7 +10,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
 Le package repository contient :
@@ -31,54 +33,67 @@ public class UserRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<Photocard> getUserWishlist(Integer userId) {
-        String query = "SELECT pc.pc_id,pc.pc_name,pc.url,pc.pc_type,pc.proposed,pc.artists_id,pc.official_sources_id\n" +
-                "FROM users_photocard_list AS upl\n" +
-                "JOIN photocards AS pc USING (pc_id)\n"+
-                "WHERE upl.users_id = ? AND upl.have = false";
+    public List<Map<String, Object>> getUserWishlist(int userId) {
+        String query = "SELECT p.pc_id, p.pc_name " +
+                "FROM users_photocard_list upl " +
+                "JOIN photocards p ON upl.pc_id = p.pc_id " +
+                "WHERE upl.user_id = ? AND upl.have = FALSE";
 
         try {
             return jdbcTemplate.query(query, new Object[]{userId}, (rs, rowNum) -> {
-                Photocard photocard = new Photocard();
-                photocard.setId(rs.getInt("pc_id"));
-                photocard.setName(rs.getString("pc_name"));
-                photocard.setImageUrl(rs.getString("url"));
-                photocard.setType(rs.getString("pc_type"));
-                photocard.setActive(rs.getBoolean("proposed"));
-                photocard.setArtistId(rs.getInt("artists_id"));
-                photocard.setSourceId(rs.getInt("official_sources_id"));
-                return photocard;
+                Map<String, Object> wishlistItem = new HashMap<>();
+                wishlistItem.put("pc_id", rs.getInt("pc_id"));
+                wishlistItem.put("pc_name", rs.getString("pc_name"));
+                return wishlistItem;
             });
         } catch (DataAccessException e) {
-            System.err.println("Erreur lors de l'exécution de la requête : " + e.getMessage());
-            e.printStackTrace(); // Pour plus de détails sur l'erreur
-            return List.of(); // Retourne une liste vide en cas d'erreur
+            System.err.println("Erreur lors de la récupération de la wishlist : " + e.getMessage());
+            return List.of();
         }
     }
 
-    public boolean updateWishlist(int userId, int photocardId, boolean have) {
-        String query = "UPDATE user_photocard_list SET have = ? WHERE user_id = ? AND photocard_id = ?";
-    
-        try {
-            int updatedRows = jdbcTemplate.update(query, have, userId, photocardId);
-            return updatedRows > 0;
-        } catch (DataAccessException e) {
-            System.err.println("Erreur lors de la mise à jour de la wishlist : " + e.getMessage());
-            return false;
-        }
-    }
-
-    public boolean addToWishlist(int userId, int photocardId, boolean have) {
-        String query = "INSERT INTO user_photocard_list (user_id, photocard_id, have) VALUES (?, ?, ?)";
+    public List<Map<String, Object>> getUserCollection(int userId) {
+        String query = "SELECT p.pc_id, p.pc_name " +
+                "FROM users_photocard_list upl " +
+                "JOIN photocards p ON upl.pc_id = p.pc_id " +
+                "WHERE upl.user_id = ? AND upl.have = TRUE";
 
         try {
-            int insertedRows = jdbcTemplate.update(query, userId, photocardId,have);
-            return insertedRows > 0; // Retourne true si au moins une ligne a été insérée
+            return jdbcTemplate.query(query, new Object[]{userId}, (rs, rowNum) -> {
+                Map<String, Object> wishlistItem = new HashMap<>();
+                wishlistItem.put("pc_id", rs.getInt("pc_id"));
+                wishlistItem.put("pc_name", rs.getString("pc_name"));
+                return wishlistItem;
+            });
         } catch (DataAccessException e) {
-            System.err.println("Erreur lors de l'ajout de la photocard à la wishlist : " + e.getMessage());
-            return false;
+            System.err.println("Erreur lors de la récupération de la wishlist : " + e.getMessage());
+            return List.of();
         }
     }
+//
+//    public boolean updateWishlist(int userId, int photocardId, boolean have) {
+//        String query = "UPDATE user_photocard_list SET have = ? WHERE user_id = ? AND photocard_id = ?";
+//
+//        try {
+//            int updatedRows = jdbcTemplate.update(query, have, userId, photocardId);
+//            return updatedRows > 0;
+//        } catch (DataAccessException e) {
+//            System.err.println("Erreur lors de la mise à jour de la wishlist : " + e.getMessage());
+//            return false;
+//        }
+//    }
+//
+//    public boolean addToWishlist(int userId, int photocardId, boolean have) {
+//        String query = "INSERT INTO user_photocard_list (user_id, photocard_id, have) VALUES (?, ?, ?)";
+//
+//        try {
+//            int insertedRows = jdbcTemplate.update(query, userId, photocardId,have);
+//            return insertedRows > 0; // Retourne true si au moins une ligne a été insérée
+//        } catch (DataAccessException e) {
+//            System.err.println("Erreur lors de l'ajout de la photocard à la wishlist : " + e.getMessage());
+//            return false;
+//        }
+//    }
 
     public boolean deleteFromWishlist(int userId, int photocardId) {
         String query = "DELETE FROM user_photocard_list WHERE user_id = ? AND photocard_id = ?";

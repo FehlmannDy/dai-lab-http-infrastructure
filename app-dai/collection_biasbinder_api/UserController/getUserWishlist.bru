@@ -1,11 +1,11 @@
 meta {
   name: getUserWishlist
   type: http
-  seq: 4
+  seq: 1
 }
 
 get {
-  url: http://localhost:7070/api/users/1/wishlist
+  url: http://localhost:7070/api/users/{userId}/wishlist
   body: none
   auth: none
 }

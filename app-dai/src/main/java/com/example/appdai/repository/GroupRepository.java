@@ -10,7 +10,13 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
 Le package repository contient :
@@ -30,6 +36,46 @@ public class GroupRepository {
     public GroupRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+//
+//    public List<String> getAllGroupNames() {
+//        String query = "SELECT groups_name FROM groups";
+//        return jdbcTemplate.query(query, (rs, rowNum) -> rs.getString("groups_name"));
+//    }
+
+//    public List<Map<String, Object>> searchGroupsByName(String name) {
+//        String query = "SELECT groups_id, groups_name FROM groups WHERE groups_name LIKE ?";
+//        return jdbcTemplate.queryForList(query, "%" + name + "%");
+//    }
+
+    public List<Map<String, Object>> getAllGroupNames() {
+        String query = "SELECT groups_id, groups_name FROM groups";
+        return jdbcTemplate.queryForList(query);
+    }
+
+    public List<Map<String, Object>> getArtistsByGroupId(int groupId) {
+        String query = "SELECT a.artists_id, a.stage_name " +
+                "FROM artists a " +
+                "JOIN groups_artists ga ON a.artists_id = ga.artists_id " +
+                "JOIN groups g ON g.groups_id = ga.groups_id " +
+                "WHERE g.groups_id = ?";
+
+        return jdbcTemplate.execute((Connection connection) -> {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, groupId);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    List<Map<String, Object>> artists = new ArrayList<>();
+
+                    while (resultSet.next()) {
+                        Map<String, Object> artist = new HashMap<>();
+                        artist.put("artists_id", resultSet.getInt("artists_id"));
+                        artist.put("stage_name", resultSet.getString("stage_name"));
+                        artists.add(artist);
+                    }
+                    return artists;
+                }
+            }
+        });
+    }
 
     public List<Group> getAllGroups(){
         String query = "SELECT * FROM groups";
@@ -45,6 +91,42 @@ public class GroupRepository {
             });
         } catch (Exception e) {
             System.err.println("Erreur lors de la requête : " + e.getMessage());
+            return List.of(); // Retourne une liste vide en cas d'erreur
+        }
+    }
+
+    public List<Artist> getGroupArtists(String groupsName) {
+        String query = "SELECT\n" +
+                "    g.groups_id,\n" +
+                "    g.groups_name,\n" +
+                "    g.gender,\n" +
+                "    g.begin_date,\n" +
+                "    g.disband_date,\n" +
+                "    a.artists_id AS artist_id,\n" +
+                "    a.stage_name,\n" +
+                "    a.birth_date,\n" +
+                "    a.active\n" +
+                "FROM\n" +
+                "    groups g\n" +
+                "JOIN\n" +
+                "    groups_artists ga ON g.groups_id = ga.groups_id\n" +
+                "JOIN\n" +
+                "    artists a ON a.artists_id = ga.artists_id\n" +
+                "WHERE\n" +
+                "    g.groups_name = ?";
+
+        try {
+            return jdbcTemplate.query(query, new Object[]{groupsName}, (rs, rowNum) -> {
+                Artist artist = new Artist();
+                artist.setArtistsId(rs.getInt("artist_id"));
+                artist.setStageName(rs.getString("stage_name"));
+                artist.setBirthDate(rs.getDate("birth_date"));
+                artist.setActive(rs.getBoolean("active"));
+                return artist;
+            });
+        } catch (DataAccessException e) {
+            System.err.println("Erreur lors de l'exécution de la requête : " + e.getMessage());
+            e.printStackTrace(); // Pour plus de détails sur l'erreur
             return List.of(); // Retourne une liste vide en cas d'erreur
         }
     }
