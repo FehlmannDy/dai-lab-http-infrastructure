@@ -1,5 +1,6 @@
 package com.example.appdai.controller;
 
+import com.example.appdai.model.UserPhotocardRequest;
 import com.example.appdai.service.UserService;
 import io.javalin.Javalin;
 import org.springframework.stereotype.Component;
@@ -54,6 +55,12 @@ public class UserController {
      * @param app the Javalin app instance used to register the routes
      */
     public void registerRoutes(Javalin app) {
+
+        app.post("/api/user/photocard", ctx -> {
+            UserPhotocardRequest request = ctx.bodyAsClass(UserPhotocardRequest.class);
+            userService.addOrUpdatePhotocard(request.getUserId(), request.getPhotocardId(), request.isHave());
+            ctx.status(200).result("Photocard mise à jour avec succès !");
+        });
 
         // Add or update a photocard in the wishlist/collection
         app.post("/api/users/{userId}/photocards", ctx -> {
