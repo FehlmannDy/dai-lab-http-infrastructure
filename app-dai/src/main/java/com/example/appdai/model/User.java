@@ -1,12 +1,19 @@
-/**
- * User Class
- * This class is used to create a User object
- * The user is composed of an ID, a name, a password, a boolean to know if the user is an Admin and a list of Photocard
- */
 package com.example.appdai.model;
 
 import java.util.List;
 
+/**
+ * Represents a user.
+ *
+ * <p>A user is composed of the following attributes:</p>
+ * <ul>
+ *   <li><b>user_id</b>: The unique identifier for the user.</li>
+ *   <li><b>username</b>: The name of the user.</li>
+ *   <li><b>password</b>: The user's password.</li>
+ *   <li><b>is_admin</b>: A boolean indicating whether the user has administrative privileges.</li>
+ *   <li><b>photocardList</b>: A list of {@link Photocard} objects associated with the user.</li>
+ * </ul>
+ */
 public class User {
 
     private int user_id;
@@ -23,6 +30,7 @@ public class User {
 
     /**
      * Constructor
+     *
      * @param usersId ID of the User
      * @param usersName Name of the User
      * @param password Password of the User
@@ -53,9 +61,9 @@ public class User {
     public void setPhotocardList(List<Photocard> photocardList) {this.photocardList = photocardList;}
 
     /**
-     * toString method
-     * This method is used to display the User object
-     * @return String
+     * Provides a string representation of the user.
+     *
+     * @return a string describing the user with all its attributes
      */
     @Override
     public String toString() {

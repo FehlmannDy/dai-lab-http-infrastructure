@@ -1,11 +1,17 @@
-/**
- * Class Group
- * This class is used to represent a group in the system.
- */
-
 package com.example.appdai.model;
 
-
+/**
+ * Represents a group.
+ *
+ * A group has the following attributes:
+ *
+ * <ul>
+ *   <li><b>groups_id</b>: The unique identifier of the group.</li>
+ *   <li><b>groups_name</b>: The name of the group.</li>
+ *   <li><b>gender</b>: Gender indicating if is a boys-bands or girls-bands.</li>
+ *   <li><b>proposed</b>: A boolean indicating if the group is proposed by a user or not.</li>
+ * </ul>
+ */
 public class Group {
 
     private int groups_id;
@@ -33,7 +39,10 @@ public class Group {
         this.proposed = true;
     }
 
-    // Getters and Setters
+    /**
+     * Getters and Setters
+     */
+
     public int getGroups_id() {
         return groups_id;
     }
@@ -63,9 +72,9 @@ public class Group {
     }
 
     /**
-     * toString Method
-     * Method to display the group's information
-     * @return String
+     * Provides a string representation of the group.
+     *
+     * @return a string describing the group with all its attributes
      */
     @Override
     public String toString() {

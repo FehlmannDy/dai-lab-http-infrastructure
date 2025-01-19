@@ -1,7 +1,5 @@
 package com.example.appdai.repository;
 
-import com.example.appdai.model.Artist;
-import com.example.appdai.model.Group;
 import com.example.appdai.model.PC_type;
 import com.example.appdai.model.Photocard;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,34 +8,39 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/*
-Le package repository contient :
-
-    Les classes d'accès aux données (via JDBC).
-    Ces classes interagissent directement avec ta base de données pour créer,
-    lire, mettre à jour ou supprimer des données (CRUD).
-
-    En bas y a des exemples mais faudra faire des prepared statements
+/**
+ * Repository class for managing photocards in the database.
+ * This class interacts with the database using JDBC to retrieve and manipulate data related to photocards.
+ *
+ * <p>It provides methods to fetch photocards, paginate them, retrieve photocards by group, and get related data like artist and group names.</p>
+ *
+ * The class uses {@link JdbcTemplate} for executing SQL queries and managing database connections.
  */
 @Repository
 public class PcRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * Constructs a new {@code PcRepository} instance.
+     *
+     * @param jdbcTemplate the {@link JdbcTemplate} used to execute SQL queries.
+     */
     @Autowired
     public PcRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // Avoir une vue peut etre ici car on aimerait pas retourner le artist id et source id mais les noms associés
-    // genre une vue qui retourne pc_id, pc_name, shop_name, image_url, type, artist_name, source_name
-    // ou une vue qui fait ça mais qui retourne deja les proposed photocards en plus
+    /**
+     * Retrieves all proposed photocards from the database.
+     *
+     * @return a list of proposed photocards.
+     * @throws RuntimeException if there is an error while fetching the proposed photocards.
+     */
     public List<Photocard> getProposedPhotocards() {
         String query = "SELECT pc_id, pc_name, shop_name, url, pc_type, artists_id, official_sources_id FROM photocards WHERE proposed = TRUE";
 
@@ -62,6 +65,14 @@ public class PcRepository {
 //        return jdbcTemplate.queryForList(query, limit, offset);
 //    }
 
+    /**
+     * Retrieves a paginated list of photocards, optionally filtered by a specific group ID.
+     *
+     * @param groupId the group ID to filter by (can be {@code null} for no filtering).
+     * @param page the page number (starting from 1).
+     * @param size the number of photocards per page.
+     * @return a list of photocards matching the given filters and pagination parameters.
+     */
     public List<Map<String, Object>> getPaginatedPcs(Integer groupId, Integer page, Integer size) {
         // Définition des valeurs par défaut si elles sont nulles ou invalides
         int pageSize = (size == null || size <= 0) ? 24 : size;
@@ -93,9 +104,11 @@ public class PcRepository {
         return jdbcTemplate.queryForList(sql, params.toArray());
     }
 
-
-
-
+    /**
+     * Retrieves all photocards with their type, including additional information about the source and artist.
+     *
+     * @return a list of photocards with their type.
+     */
     public List<Photocard> getAllPcsWithType() {
         String query = "SELECT * FROM photocards_for_artist";
         try {
@@ -116,16 +129,27 @@ public class PcRepository {
         }
     }
 
+    /**
+     * Retrieves a list of all photocards' names for IDs less than 15.
+     *
+     * @return a list of photocard names.
+     */
     public List<String> getAllPcs() {
         String query = "SELECT pc_name FROM photocards WHERE pc_id < 15";
         try {
             return jdbcTemplate.queryForList(query, String.class);
         } catch (Exception e) {
             System.err.println("Erreur lors de la return jdbcTemplate.queryForList(query, Group.class);quête : " + e.getMessage());
-            return List.of(); // Retourne une liste vide en cas d'erreur
+            return List.of();
         }
     }
 
+    /**
+     * Retrieves the name of the group associated with a given artist ID.
+     *
+     * @param artistId the ID of the artist.
+     * @return the name of the group associated with the artist, or {@code null} if no group is found.
+     */
     public String getArtistGroup(int artistId) {
 
         String query = "SELECT g.groups_name " +
@@ -143,6 +167,12 @@ public class PcRepository {
         }
     }
 
+    /**
+     * Retrieves all photocards associated with a specific group ID.
+     *
+     * @param groupId the group ID to filter by.
+     * @return a list of photocards associated with the specified group.
+     */
     public List<Photocard> getPhotocardsByGroup(int groupId) {
         String query = "SELECT * FROM photocards_for_group WHERE groups_id = ?";
         try {
@@ -159,7 +189,7 @@ public class PcRepository {
             });
         } catch (DataAccessException e) {
             System.err.println("Erreur lors de l'exécution de la requête : " + e.getMessage());
-            return List.of(); // Retourne une liste vide en cas d'erreur
+            return List.of();
         }
     }
 }

@@ -1,21 +1,30 @@
-/**
- * Photocard Class
- * This class is used to create Photocard objects
- * A Photocard is composed of an ID, a pc_name, a shopName, an image URL, a pc_type, an artist ID and a source ID
- * The proposed status is used to know if the artist is proposed by a user or not.
- */
 package com.example.appdai.model;
 
+/**
+ * Represents a photocard.
+ *
+ * <p>A photocard is an item with the following attributes:</p>
+ * <ul>
+ *   <li><b>pc_id</b>: The unique identifier for the photocard.</li>
+ *   <li><b>pc_name</b>: The name of the photocard.</li>
+ *   <li><b>shop_name</b>: The shop name where the photocard was obtained, or <code>null</code> if not applicable.</li>
+ *   <li><b>url</b>: The image URL associated with the photocard.</li>
+ *   <li><b>pc_type</b>: The type of photocard (e.g., PCA, POB), represented as a {@link PC_type} enum.</li>
+ *   <li><b>artists_id</b>: The unique identifier of the artist associated with the photocard (foreign key).</li>
+ *   <li><b>official_sources_id</b>: The unique identifier of the official source associated with the photocard (foreign key).</li>
+ *   <li><b>proposed</b>: A boolean indicating whether the photocard was proposed by a user or not.</li>
+ * </ul>
+ */
 public class Photocard {
 
-    private int pc_id;                 // ID unique de la carte
-    private String pc_name;            // Nom de la carte
-    private String shop_name;        // if not null = Benefit
-    private String url;        // URL de l'image
-    private PC_type pc_type;            // Type de la carte (PCA, POB, etc.)
-    private int artists_id;           // ID de l'artiste (FK)
-    private int official_sources_id;           // ID de la source officielle (FK)
-    private boolean proposed;       // Indique si la carte est proposée
+    private int pc_id;
+    private String pc_name;
+    private String shop_name;
+    private String url;
+    private PC_type pc_type;
+    private int artists_id;
+    private int official_sources_id;
+    private boolean proposed;
 
 
     /**
@@ -26,6 +35,7 @@ public class Photocard {
 
     /**
      * Constructor without shopName
+     *
      * @param id ID of the Photocard
      * @param name Name of the Photocard
      * @param imageUrl Image URL of the Photocard
@@ -46,6 +56,7 @@ public class Photocard {
 
     /**
      * Constructor with shopName
+     *
      * @param id ID of the Photocard
      * @param name Name of the Photocard
      * @param shopName Shop pc_name of the Photocard
@@ -65,7 +76,10 @@ public class Photocard {
         this.proposed = true;
     }
 
-    // Getters et Setters
+    /**
+     * Default constructor
+     */
+
     public int getPc_id() {
         return pc_id;
     }
@@ -123,9 +137,9 @@ public class Photocard {
     }
 
     /**
-     * toString Method
-     * This method is used to display the Photocard object
-     * @return String
+     * Provides a string representation of the photocard.
+     *
+     * @return a string describing the photocard with all its attributes
      */
     @Override
     public String toString() {

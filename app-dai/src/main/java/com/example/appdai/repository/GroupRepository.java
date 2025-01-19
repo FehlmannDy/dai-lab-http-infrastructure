@@ -15,25 +15,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/*
-Le package repository contient :
-
-    Les classes d'accès aux données (via JDBC).
-    Ces classes interagissent directement avec ta base de données pour créer,
-    lire, mettre à jour ou supprimer des données (CRUD).
-
-    En bas y a des exemples mais faudra faire des prepared statements
+/**
+ * Repository class for accessing data related to groups and artists in the database.
+ * This class interacts directly with the database using JDBC to perform CRUD operations.
+ * It provides methods for retrieving group information and related artists from the database.
+ *
+ * <p>It contains methods to:
+ * 1. Get a list of artists by a group ID.
+ * 2. Get all groups that have not been proposed yet.
+ * 3. Get artists related to a specific group by group name.
+ * </p>
+ *
+ * The class uses {@link JdbcTemplate} for executing SQL queries and handling database connections.
  */
 @Repository
 public class GroupRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * Constructs a new {@code GroupRepository} instance.
+     *
+     * @param jdbcTemplate the {@link JdbcTemplate} used to execute SQL queries.
+     */
     @Autowired
     public GroupRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * Retrieves a list of artists associated with a specific group ID.
+     *
+     * @param groupId the ID of the group whose artists are to be retrieved.
+     * @return a list of maps where each map represents an artist with their ID and stage name.
+     * @throws DataAccessException if an error occurs while querying the database.
+     */
     public List<Map<String, Object>> getArtistsByGroupId(int groupId) {
         String query = "SELECT a.artists_id, a.stage_name " +
                 "FROM artists a " +
@@ -59,6 +75,11 @@ public class GroupRepository {
         });
     }
 
+    /**
+     * Retrieves all groups that are not marked as "proposed".
+     *
+     * @return a list of {@link Group} objects representing all non-proposed groups.
+     */
     public List<Group> getAllGroups(){
         String query = "SELECT * FROM groups WHERE proposed = FALSE";
         try {
@@ -71,30 +92,22 @@ public class GroupRepository {
             });
         } catch (Exception e) {
             System.err.println("Erreur lors de la requête : " + e.getMessage());
-            return List.of(); // Retourne une liste vide en cas d'erreur
+            return List.of();
         }
     }
 
+    /**
+     * Retrieves a list of artists associated with a specific group name.
+     *
+     * @param groupsName the name of the group whose artists are to be retrieved.
+     * @return a list of {@link Artist} objects representing the artists in the specified group.
+     */
     public List<Artist> getGroupArtists(String groupsName) {
-        String query = "SELECT\n" +
-                "    g.groups_id,\n" +
-                "    g.groups_name,\n" +
-                "    g.gender,\n" +
-                "    g.begin_date,\n" +
-                "    g.disband_date,\n" +
-                "    a.artists_id AS artist_id,\n" +
-                "    a.stage_name,\n" +
-                "    a.birth_date,\n" +
-                "    a.active\n" +
-                "FROM\n" +
-                "    groups g\n" +
-                "JOIN\n" +
-                "    groups_artists ga ON g.groups_id = ga.groups_id\n" +
-                "JOIN\n" +
-                "    artists a ON a.artists_id = ga.artists_id\n" +
-                "WHERE\n" +
-                "    g.groups_name = ?";
-
+        String query = "SELECT  a.artists_id AS artist_id, a.stage_name, a.active\n" +
+                "FROM groups g\n" +
+                "JOIN groups_artists ga ON g.groups_id = ga.groups_id\n" +
+                "JOIN artists a ON a.artists_id = ga.artists_id\n" +
+                "WHERE g.groups_name = ?";
         try {
             return jdbcTemplate.query(query, new Object[]{groupsName}, (rs, rowNum) -> {
                 Artist artist = new Artist();
@@ -105,8 +118,7 @@ public class GroupRepository {
             });
         } catch (DataAccessException e) {
             System.err.println("Erreur lors de l'exécution de la requête : " + e.getMessage());
-            e.printStackTrace(); // Pour plus de détails sur l'erreur
-            return List.of(); // Retourne une liste vide en cas d'erreur
+            return List.of();
         }
     }
 
