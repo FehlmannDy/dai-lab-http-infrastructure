@@ -54,7 +54,7 @@ public class OfController {
 
             String groupName = ctx.queryParam("groupName");
             String title = ctx.queryParam("title");
-            String type = ctx.queryParam("type");  // Type devrait être une valeur de l'enum OF_type
+            String type = ctx.queryParam("type");
             String versionName = ctx.queryParam("version_name");
 
             if (groupName == null || groupName.isEmpty() || title == null || title.isEmpty() || type == null || type.isEmpty()) {
