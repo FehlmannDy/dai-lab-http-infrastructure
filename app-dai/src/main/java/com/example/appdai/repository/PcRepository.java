@@ -101,13 +101,13 @@ public class PcRepository {
         try {
             return jdbcTemplate.query(query, (rs, rowNum) -> {
                 Photocard photocard = new Photocard();
-                photocard.setId(rs.getInt("photocard_id"));
-                photocard.setName(rs.getString("pc_name"));
-                photocard.setShopName(rs.getString("shop_name"));
-                photocard.setImageUrl(rs.getString("url"));
-                photocard.setType(PC_type.valueOf(rs.getString("pc_type")));
-                photocard.setArtistId(rs.getInt("artists_id"));
-                photocard.setSourceId(rs.getInt("official_sources_id"));
+                photocard.setPc_id(rs.getInt("photocard_id"));
+                photocard.setPc_name(rs.getString("pc_name"));
+                photocard.setShop_name(rs.getString("shop_name"));
+                photocard.setUrl(rs.getString("url"));
+                photocard.setPc_type(PC_type.valueOf(rs.getString("pc_type")));
+                photocard.setArtists_id(rs.getInt("artists_id"));
+                photocard.setOfficial_sources_id(rs.getInt("official_sources_id"));
                 return photocard;
             });
         } catch (Exception e) {
@@ -148,13 +148,13 @@ public class PcRepository {
         try {
             return jdbcTemplate.query(query, new Object[]{groupId}, (rs, rowNum) -> {
                 Photocard photocard = new Photocard();
-                photocard.setId(rs.getInt("photocard_id"));
-                photocard.setName(rs.getString("pc_name"));
-                photocard.setShopName(rs.getString("shop_name"));
-                photocard.setImageUrl(rs.getString("url"));
-                photocard.setType(PC_type.valueOf(rs.getString("pc_type")));
-                photocard.setArtistId(rs.getInt("artists_id"));
-                photocard.setSourceId(rs.getInt("official_sources_id"));
+                photocard.setPc_id(rs.getInt("photocard_id"));
+                photocard.setPc_name(rs.getString("pc_name"));
+                photocard.setShop_name(rs.getString("shop_name"));
+                photocard.setUrl(rs.getString("url"));
+                photocard.setPc_type(PC_type.valueOf(rs.getString("pc_type")));
+                photocard.setArtists_id(rs.getInt("artists_id"));
+                photocard.setOfficial_sources_id(rs.getInt("official_sources_id"));
                 return photocard;
             });
         } catch (DataAccessException e) {
