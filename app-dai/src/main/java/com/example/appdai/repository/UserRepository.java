@@ -10,30 +10,35 @@ import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.util.*;
 
-/*
-Le package repository contient :
-
-    Les classes d'accès aux données (via JDBC).
-    Ces classes interagissent directement avec ta base de données pour créer,
-    lire, mettre à jour ou supprimer des données (CRUD).
-
-    En bas y a des exemples mais faudra faire des prepared statements
+/**
+ * Repository class to interact with the database for user-related operations, specifically
+ * managing the user's photocard list (wishlist and collection).
+ *
+ * This class provides methods for adding, updating, deleting, retrieving, and proposing photocards
+ * in the user's list, as well as handling administrative actions related to proposed photocards.
  */
 @Repository
 public class UserRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * Constructs a {@link UserRepository} with the provided {@link JdbcTemplate}.
+     *
+     * @param jdbcTemplate The {@link JdbcTemplate} used for database operations.
+     */
     @Autowired
     public UserRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     /**
-     * Add or update a photocard in the user's list (wishlist or collection)
-     * @param userId user ID
-     * @param photocardId photocard ID
-     * @param have true if the user has the photocard, false if it's in the wishlist
+     * Adds or updates a photocard in the user's list (either wishlist or collection).
+     *
+     * @param userId The ID of the user.
+     * @param photocardId The ID of the photocard.
+     * @param have A boolean indicating if the photocard is in the user's collection (true) or wishlist (false).
+     * @throws RuntimeException If an error occurs while adding or updating the photocard.
      */
     public void addOrUpdatePhotocard(int userId, int photocardId, boolean have) {
         String query = "INSERT INTO users_photocard_list (user_id, pc_id, have) VALUES (?, ?, ?)";
@@ -52,9 +57,11 @@ public class UserRepository {
     }
 
     /**
-     * Delete a photocard from the user's list
-     * @param userId user ID
-     * @param photocardId photocard ID
+     * Deletes a photocard from the user's list.
+     *
+     * @param userId The ID of the user.
+     * @param photocardId The ID of the photocard to be deleted.
+     * @throws RuntimeException If no photocard is found or deleted, or if an error occurs.
      */
     public void deletePcFromUserList(int userId, int photocardId) {
         String query = "DELETE FROM users_photocard_list WHERE user_id = ? AND pc_id = ?";
@@ -76,15 +83,14 @@ public class UserRepository {
     }
 
     /**
-     * Récupère la collection de photocards d'un utilisateur spécifique en fonction de son statut "have" (possédé ou non).
+     * Retrieves the collection of photocards for a specific user, filtered by their "have" status (owned or not).
      *
-     * @param userId l'identifiant de l'utilisateur pour lequel récupérer la collection.
-     * @param have un indicateur booléen qui spécifie si les photocards récupérées sont possédées (true) ou non (false).
-     * @return une liste de {@link Photocard} représentant les photocards de la collection de l'utilisateur.
-     *         Retourne une liste vide si aucune photocard ne correspond ou en cas d'erreur.
-     * @throws DataAccessException en cas de problème d'accès à la base de données (géré en interne avec un retour de liste vide).
-     *
-     **/
+     * @param userId The ID of the user.
+     * @param have A boolean that specifies if the retrieved photocards are owned (true) or not (false).
+     * @return A list of {@link Photocard} representing the user's collection.
+     *         Returns an empty list if no matching photocards are found or if an error occurs.
+     * @throws DataAccessException If an error occurs while retrieving the collection from the database.
+     */
     public List<Photocard> getUserCollection(int userId, boolean have) {
         String query = "SELECT p.pc_id, p.pc_name, p.shop_name, p.url, p.pc_type, p.artists_id, p.official_sources_id, a.stage_name, o.title " +
                 "FROM users_photocard_list upl " +
@@ -112,39 +118,34 @@ public class UserRepository {
     }
 
     /**
-     * Propose a photocard
-     * @param name name of the photocard
-     * @param shopName shop name of the photocard (optional)
-     * @param imageUrl image URL of the photocard
-     * @param pcType type of the photocard
-     * @param artistId ID of the artist
-     * @param sourceId ID of the official source
+     * Proposes a photocard for submission.
+     *
+     * @param photocard The {@link Photocard} to be proposed.
+     * @throws IllegalArgumentException If any required field of the photocard is null or empty.
+     * @throws RuntimeException If an error occurs while adding the proposed photocard.
      */
-    public void proposePhotocard(String name, String shopName, String imageUrl, String pcType, Integer artistId,
-                                     Integer sourceId) {
-        if (name == null || name.isEmpty() || pcType == null || imageUrl == null || artistId == null ||
-                sourceId == null) {
+    public void proposePhotocard(Photocard photocard) {
+        if (photocard.getPc_name() == null || photocard.getPc_name().isEmpty() || photocard.getPc_type() == null || photocard.getUrl() == null) {
             throw new IllegalArgumentException("Every field is required but shop name is optional");
         }
-
         String query = "INSERT INTO photocards (pc_name, shop_name, url, pc_type, proposed, artists_id, official_sources_id) " +
                 "VALUES (?, ?, ?, CAST(? AS pc_type_enum), TRUE, ?, ?)";
 
         try {
             jdbcTemplate.update(connection -> {
                 PreparedStatement stmt = connection.prepareStatement(query);
-                stmt.setString(1, name);
+                stmt.setString(1, photocard.getPc_name());
 
-                if ("POB".equalsIgnoreCase(pcType) && shopName != null && !shopName.isEmpty()) {
-                    stmt.setString(2, shopName);
+                if (photocard.getPc_type() == PC_type.POB && photocard.getShop_name() != null && !photocard.getShop_name().isEmpty()) {
+                    stmt.setString(2, photocard.getShop_name());
                 } else {
                     stmt.setNull(2, Types.VARCHAR);
                 }
 
-                stmt.setString(3, imageUrl);
-                stmt.setString(4, pcType);
-                stmt.setInt(5, artistId);
-                stmt.setInt(6, sourceId);
+                stmt.setString(3, photocard.getUrl());
+                stmt.setString(4, photocard.getPc_type().toString());
+                stmt.setInt(5, photocard.getArtists_id());
+                stmt.setInt(6, photocard.getOfficial_sources_id());
 
                 return stmt;
             });
@@ -154,13 +155,15 @@ public class UserRepository {
     }
 
 
-    // ---------------------------------------------------------------------------------------------
-    // ADMIN METHODS
+    // --------------- ADMIN METHODS ---------------
 
-    //bon on peut refactor les deux hein
+    //TODO bon on peut refactor les deux hein
     /**
-     * Accept proposed photocards
-     * @param photocardIds list of photocard IDs
+     * Accepts proposed photocards by updating their status.
+     *
+     * @param photocardIds A list of photocard IDs to accept.
+     * @throws IllegalArgumentException If the list of photocard IDs is null or empty.
+     * @throws RuntimeException If an error occurs while updating the proposed photocards.
      */
     public void acceptProposedPhotocard(List<Integer> photocardIds) {
         if (photocardIds == null || photocardIds.isEmpty()) {
@@ -182,8 +185,11 @@ public class UserRepository {
     }
 
     /**
-     * Reject proposed photocards
-     * @param photocardIds list of photocard IDs
+     * Rejects proposed photocards by deleting them from the database.
+     *
+     * @param photocardIds A list of photocard IDs to reject.
+     * @throws IllegalArgumentException If the list of photocard IDs is null or empty.
+     * @throws RuntimeException If an error occurs while rejecting the proposed photocards.
      */
     public void rejectProposedPhotocard(List<Integer> photocardIds) {
         if (photocardIds == null || photocardIds.isEmpty()) {

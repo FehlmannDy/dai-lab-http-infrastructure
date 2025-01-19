@@ -1,23 +1,25 @@
 package com.example.appdai.controller;
 
-import com.example.appdai.model.Artist;
 import com.example.appdai.model.Group;
 import io.javalin.Javalin;
 import org.springframework.stereotype.Component;
-import com.example.appdai.model.Photocard;
 import com.example.appdai.service.GroupService;
 
 import java.util.List;
 import java.util.Map;
-import java.time.LocalDate;
 import java.util.stream.Collectors;
 
-/*
-Le package controller regroupe toutes les classes responsables de gérer les requêtes HTTP (les endpoints).
-Chaque controller correspond généralement à une entité ou une ressource spécifique.
-
-Exemple :
-    GroupController : Gère les routes liées aux groupes.
+/**
+ * Handles HTTP requests related to groups in the application.
+ *
+ * <p>This controller is responsible for defining endpoints that allow interaction with group-related resources.
+ * The following operations are supported:</p>
+ * <ul>
+ *   <li>Retrieving a list of all group names.</li>
+ *   <li>Retrieving a list of artists associated with a specific group.</li>
+ * </ul>
+ *
+ * <p>The routes are registered using the provided Javalin application instance.</p>
  */
 @Component
 public class GroupController {
@@ -25,13 +27,31 @@ public class GroupController {
     private final Javalin app;
     private final GroupService groupService;
 
+    /**
+     * Constructs a new {@code GroupController} with the specified Javalin app and {@link GroupService}.
+     *
+     * @param app the Javalin application instance used to register routes
+     * @param service the service layer responsible for group-related operations
+     */
     public GroupController(Javalin app, GroupService service) {
         this.app = app;
         this.groupService = service;
     }
+
+    /**
+     * Registers the routes for group-related endpoints.
+     *
+     * <p>The following endpoints are defined:</p>
+     * <ul>
+     *   <li><b>GET /api/groupslist</b>: Retrieves the list of all group names for a dropdown menu.</li>
+     *   <li><b>GET /api/groups/{groupId}/artists</b>: Retrieves a list of artists for the specified group ID.</li>
+     * </ul>
+     *
+     * @param app the Javalin application instance where the routes are registered
+     */
     public void registerRoutes(Javalin app) {
 
-        // Get the list of all groups names for the dropdown menu
+        // Retrieves the list of all group names for a dropdown menu.
         app.get("/api/groupslist", ctx -> {
             List<Group> groups = groupService.getAllGroupNames();
             if (!groups.isEmpty()) {
@@ -41,14 +61,21 @@ public class GroupController {
             }
         });
 
-        // Get the list of artists for a specific group
+        // Retrieves a list of artists for the specified group ID.
         app.get("/api/groups/{groupId}/artists", ctx -> {
-            int groupId = Integer.parseInt(ctx.pathParam("groupId"));
-            List<Map<String, Object>> artists = groupService.getArtistsByGroupId(groupId);
-            if (!artists.isEmpty()) {
-                ctx.status(200).json(artists);
-            } else {
-                ctx.status(404).result("No artists found for this group");
+            try {
+                int groupId = Integer.parseInt(ctx.pathParam("groupId"));
+                List<Map<String, Object>> artists = groupService.getArtistsByGroupId(groupId);
+                if (!artists.isEmpty()) {
+                    ctx.status(200).json(artists);
+                } else {
+                    ctx.status(404).result("No artists found for this specific group");
+                }
+            }catch (NumberFormatException e) {
+                ctx.status(400).result("Invalid group ID");
+            }
+            catch (Exception e) {
+                ctx.status(500).result("Unexpected error");
             }
         });
 
