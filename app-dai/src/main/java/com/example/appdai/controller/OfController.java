@@ -69,9 +69,9 @@ public class OfController {
             }});
 
         // Fetches official sources for a specific group by group name
-        app.get("/api/groups/{groupName}/official-sources", ctx -> {
+        app.get("/api/groups/official-sources", ctx -> {
             try {
-                String groupName = ctx.pathParam("groupName");
+                String groupName = ctx.queryParam("groupName");
 
                 List<Map<String, Object>> officialSources = ofService.getOfficialSourcesForGroup(groupName);
 
