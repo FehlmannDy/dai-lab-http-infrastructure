@@ -7,6 +7,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Repository class for accessing data related to official sources in the database.
@@ -110,6 +114,31 @@ public class OfRepository {
         }catch (DataAccessException e){
             System.err.println("Erreur de la validité de l'official source : " + e.getMessage());
             return false;
+        }
+    }
+
+    public List<Map<String, Object>> getOfficialSourcesForGroup(String groupName) {
+        // La requête SQL avec un paramètre pour le nom du groupe
+        String query = "SELECT o.official_sources_id, o.title, o.version_name " +
+                "FROM official_sources o " +
+                "INNER JOIN groups_official_sources go ON o.official_sources_id = go.official_sources_id " +
+                "INNER JOIN biasbinder_bst.groups g ON g.groups_id = go.groups_id " +
+                "WHERE g.groups_name = ? AND o.proposed = false";
+
+        try {
+            List<Map<String, Object>> results = jdbcTemplate.queryForList(query, new Object[]{groupName});
+
+            return results.stream().map(row -> {
+                Map<String, Object> result = new HashMap<>();
+                String titleAndVersion = row.get("title") + " " + row.get("version_name");
+                result.put("official_sources_id", row.get("official_sources_id"));
+                result.put("title_version", titleAndVersion);
+                return result;
+            }).collect(Collectors.toList());
+
+        } catch (DataAccessException e) {
+            System.err.println("Erreur lors de l'exécution de la requête : " + e.getMessage());
+            return List.of();
         }
     }
 

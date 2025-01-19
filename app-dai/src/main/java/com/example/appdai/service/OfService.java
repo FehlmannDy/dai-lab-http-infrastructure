@@ -4,6 +4,9 @@ import com.example.appdai.model.OfficialSource;
 import com.example.appdai.repository.OfRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Service class responsible for handling operations related to official sources.
  * It acts as an intermediary between the controller and the repository layers for official source-related operations.
@@ -19,6 +22,10 @@ public class OfService {
      */
     public OfService(OfRepository officialSourceRepository) {
         this.officialSourceRepository = officialSourceRepository;
+    }
+
+    public List<Map<String, Object>> getOfficialSourcesForGroup(String groupName) {
+        return officialSourceRepository.getOfficialSourcesForGroup(groupName);
     }
 
     /**

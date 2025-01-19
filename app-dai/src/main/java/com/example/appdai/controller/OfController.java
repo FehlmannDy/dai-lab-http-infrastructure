@@ -7,6 +7,7 @@ import com.example.appdai.service.OfService;
 import io.javalin.Javalin;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -66,6 +67,23 @@ public class OfController {
             } catch (Exception e) {
                 ctx.status(500).result("Unexpected error");
             }});
+
+        // Fetches official sources for a specific group by group name
+        app.get("/api/groups/{groupName}/official-sources", ctx -> {
+            try {
+                String groupName = ctx.pathParam("groupName");
+
+                List<Map<String, Object>> officialSources = ofService.getOfficialSourcesForGroup(groupName);
+
+                if (officialSources != null && !officialSources.isEmpty()) {
+                    ctx.status(200).json(officialSources);
+                } else {
+                    ctx.status(404).result("No official sources found for the specified group");
+                }
+            } catch (Exception e) {
+                ctx.status(500).result("Unexpected error occurred");
+            }
+        });
 //
 //        // GET: la liste de tous les groupes (où proposed = false)
 //        app.get("/api/officialsources", ctx -> {
