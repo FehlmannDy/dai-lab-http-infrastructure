@@ -1,0 +1,16 @@
+meta {
+  name: getPaginatedPcs
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:7070/api/photocards?page=2&size=24
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 2
+  size: 24
+}

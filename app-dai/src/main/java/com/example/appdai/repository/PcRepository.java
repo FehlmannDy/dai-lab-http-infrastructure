@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,46 @@ public class PcRepository {
             throw new RuntimeException("Error while getting proposed photocards: " + e.getMessage());
         }
     }
+
+//    public List<Map<String, Object>> getPaginatedPcs(int offset, int limit) {
+//        String query = "SELECT pc_id, pc_name, url, pc_type, artists_id FROM photocards ORDER BY pc_id LIMIT ? OFFSET ?";
+//
+//        return jdbcTemplate.queryForList(query, limit, offset);
+//    }
+
+    public List<Map<String, Object>> getPaginatedPcs(Integer groupId, Integer page, Integer size) {
+        // Définition des valeurs par défaut si elles sont nulles ou invalides
+        int pageSize = (size == null || size <= 0) ? 24 : size;
+        int pageOffset = (page == null || page <= 0) ? 0 : (page - 1) * pageSize;
+
+        System.out.println("Final Params: groupId=" + groupId + ", size=" + pageSize + ", offset=" + pageOffset);
+
+        String sql = """
+        SELECT 
+            p.pc_id, p.pc_name, p.url, p.pc_type, 
+            a.stage_name AS artist_name, 
+            g.groups_id AS group_id, g.groups_name AS group_name 
+        FROM photocards p 
+        JOIN artists a ON p.artists_id = a.artists_id 
+        JOIN groups_artists ga ON a.artists_id = ga.artists_id 
+        JOIN groups g ON ga.groups_id = g.groups_id 
+        """
+                + (groupId != null ? "WHERE g.groups_id = ? " : "")  // Ajout du filtrage si groupId est présent
+                + "ORDER BY p.pc_id LIMIT ? OFFSET ?";
+
+        // Liste des paramètres à passer
+        List<Object> params = new ArrayList<>();
+        if (groupId != null) {
+            params.add(groupId);
+        }
+        params.add(pageSize);
+        params.add(pageOffset);
+
+        return jdbcTemplate.queryForList(sql, params.toArray());
+    }
+
+
+
 
     public List<Photocard> getAllPcsWithType() {
         String query = "SELECT * FROM photocards_for_artist";

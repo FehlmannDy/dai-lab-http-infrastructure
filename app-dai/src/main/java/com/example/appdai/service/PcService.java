@@ -37,4 +37,9 @@ public class PcService {
         return pcRepository.getPhotocardsByGroup(groupId);
     }
 
+    public List<Map<String, Object>> getPaginatedPcs(Integer groupId, int page, int size) {
+        int offset = (page - 1) * size;
+        return pcRepository.getPaginatedPcs(groupId, size, offset);
+    }
+
 }

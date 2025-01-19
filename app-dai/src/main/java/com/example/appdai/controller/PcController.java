@@ -39,6 +39,18 @@ public class PcController {
             List<String> allPcs = cardService.getAllPcs();
             ctx.status(200).json(Map.of("cards", allPcs));
         });
+        app.get("/api/photocards", ctx -> {
+            String groupIdParam = ctx.queryParam("groupId");
+            Integer groupId = (groupIdParam != null && !groupIdParam.isEmpty()) ? Integer.parseInt(groupIdParam) : null;
+
+            int page = Integer.parseInt(ctx.queryParam("page") != null ? ctx.queryParam("page") : "1");
+            int size = Integer.parseInt(ctx.queryParam("size") != null ? ctx.queryParam("size") : "24");
+
+            List<Map<String, Object>> photocards = cardService.getPaginatedPcs(groupId, page, size);
+
+            ctx.json(photocards);
+        });
+
 
         app.get("/api/proposedphotocards", ctx -> {
             List<Photocard> proposedPhotocards = cardService.getProposedPhotocards();
