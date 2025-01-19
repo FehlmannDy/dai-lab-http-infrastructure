@@ -89,8 +89,8 @@ public class UserRepository {
         String query = "SELECT p.pc_id, p.pc_name, p.shop_name, p.url, p.pc_type, p.artists_id, p.official_sources_id, a.stage_name, o.title " +
                 "FROM users_photocard_list upl " +
                 "JOIN photocards p ON upl.pc_id = p.pc_id " +
-                "JOIN artists a ON pc.artists_id = a.artists_id " +
-                "JOIN official_sources o ON p.official_sources_id = o.id " +
+                "JOIN artists a ON p.artists_id = a.artists_id " +
+                "JOIN official_sources o ON p.official_sources_id = o.official_sources_id " +
                 "WHERE upl.user_id = ? AND upl.have = ?";
 
         try {
