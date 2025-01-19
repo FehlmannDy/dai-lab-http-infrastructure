@@ -1,9 +1,11 @@
 package com.example.appdai;
 
 import com.example.appdai.controller.GroupController;
+import com.example.appdai.controller.OfController;
 import com.example.appdai.controller.PcController;
 import com.example.appdai.controller.UserController;
 import com.example.appdai.service.GroupService;
+import com.example.appdai.service.OfService;
 import com.example.appdai.service.PcService;
 import com.example.appdai.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +20,14 @@ public class AppDaiApplication implements CommandLineRunner {
     private final PcService pcService;
     private final GroupService groupService;
     private final UserService userService;
+    private final OfService ofService;
 
     @Autowired
-    public AppDaiApplication(PcService pcService, GroupService groupService, UserService userService) {
+    public AppDaiApplication(PcService pcService, GroupService groupService, UserService userService, OfService ofService) {
         this.pcService = pcService;
         this.groupService = groupService;
         this.userService = userService;
+        this.ofService = ofService;
     }
 
     public static void main(String[] args) {
@@ -39,10 +43,12 @@ public class AppDaiApplication implements CommandLineRunner {
         PcController pcController = new PcController(app, pcService);
         GroupController groupController = new GroupController(app, groupService);
         UserController userController = new UserController(app, userService);
+        OfController ofController = new OfController(app, ofService);
 
         pcController.registerRoutes(app);
         groupController.registerRoutes(app);
         userController.registerRoutes(app);
+        ofController.registerRoutes(app);
 
         app.start(7070);
     }

@@ -1,5 +1,6 @@
 package com.example.appdai.service;
 
+import com.example.appdai.model.PC_type;
 import com.example.appdai.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,11 @@ public class UserService {
 
     public List<Map<String, Object>> getUserCollection(int userId) {
         return userRepository.getUserCollection(userId);
+    }
+
+    public void proposePhotocard(String name, String shopName, String imageUrl, String pcType, Integer artistId,
+                                 Integer sourceId) {
+        userRepository.proposePhotocard(name, shopName, imageUrl, pcType, artistId, sourceId);
     }
 
     // ------------------- ADMIN -------------------

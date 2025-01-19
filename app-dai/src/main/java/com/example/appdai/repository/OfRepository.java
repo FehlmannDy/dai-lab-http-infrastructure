@@ -1,16 +1,14 @@
 package com.example.appdai.repository;
 
-import com.example.appdai.model.Artist;
-import com.example.appdai.model.Group;
-import com.example.appdai.model.OfficialSource;
+import com.example.appdai.model.*;
 import com.example.appdai.model.OfficialSource.*;
-import com.example.appdai.model.Photocard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 
 /*
@@ -31,6 +29,27 @@ public class OfRepository {
     public OfRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
+    // proposeOfficialSource
+    public void proposeOfficialSource(String title, String versionName, String releaseDate, PC_type type) {
+        String query = "INSERT INTO official_sources (title, version_name, release_date, type, proposed) " +
+                "VALUES (?, ?, ?, ?, TRUE)";
+
+        try {
+            jdbcTemplate.update(connection -> {
+                PreparedStatement stmt = connection.prepareStatement(query);
+                stmt.setString(1, title);
+                stmt.setString(2, releaseDate);
+                stmt.setString(3, versionName);
+                stmt.setString(4, type.toString());
+                return stmt;
+            });
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error while proposing official source: " + e.getMessage());
+        }
+    }
+
+
 //
 //    public List<OfficialSource> getAllSources(){
 //        String query = "SELECT * FROM official_sources WHERE proposed = false";

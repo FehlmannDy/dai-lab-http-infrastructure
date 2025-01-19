@@ -1,0 +1,27 @@
+meta {
+  name: proposePhotocard
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:7070/api/photocards/proposecard
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "pcName": "Golden Hour Special",
+    "shopName": "Weverse",
+    "imageUrl": "https://example.com/image.jpg",
+    "pcType": "POB",
+    "artistId": 3,
+    "sourceId": 3
+  }
+  
+}

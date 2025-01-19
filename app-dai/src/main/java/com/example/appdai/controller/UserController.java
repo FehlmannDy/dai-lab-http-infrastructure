@@ -2,6 +2,7 @@ package com.example.appdai.controller;
 
 import com.example.appdai.model.Artist;
 import com.example.appdai.model.Group;
+import com.example.appdai.model.PC_type;
 import com.example.appdai.service.UserService;
 import io.javalin.Javalin;
 import org.springframework.stereotype.Component;
@@ -87,6 +88,21 @@ public class UserController {
             }
         });
 
+        app.post("/api/photocards/proposecard", ctx -> {
+            Map<String, Object> body = ctx.bodyAsClass(Map.class);
+
+            String pcName = (String) body.get("pcName");
+            String pcType = (String) body.get("pcType");
+            String imageUrl = (String) body.get("imageUrl");
+            Integer artistId = (Integer) body.get("artistId");
+            Integer sourceId = (Integer) body.get("sourceId");
+            String shopName = (String) body.get("shopName");
+
+            userService.proposePhotocard(pcName, shopName, imageUrl, pcType, artistId, sourceId);
+            ctx.status(201).result("Photocard proposed successfully");
+        });
+
+
         // Accept proposed photocards
         app.patch("/api/admin/accept", ctx -> {
             Map<String, Object> body = ctx.bodyAsClass(Map.class);
@@ -114,6 +130,8 @@ public class UserController {
             userService.rejectProposedPhotocard(photocardIds);
             ctx.status(200).result("Proposed photocards rejected");
         });
+
+
 
 
 
