@@ -43,7 +43,7 @@ public class OfRepository {
      */
     public void proposeOfficialSource(OfficialSource officialSource) {
         String query = "INSERT INTO official_sources (title, version_name, type, proposed) " +
-                "VALUES (?, ?, ?, TRUE)";
+                "VALUES (?, ?, CAST(? AS source_type_enum), TRUE)";
 
         try {
             jdbcTemplate.update(connection -> {

@@ -1,5 +1,6 @@
 package com.example.appdai.controller;
 
+import com.example.appdai.model.PC_type;
 import com.example.appdai.model.UserPhotocardRequest;
 import com.example.appdai.service.UserService;
 import io.javalin.Javalin;
@@ -113,11 +114,30 @@ public class UserController {
             }
         });
 
-        app.post("/api/photocards/proposecard", ctx -> {
-            Photocard body = ctx.bodyAsClass(Photocard.class);
-            userService.proposePhotocard(body);
+        app.post("/api/photocards/proposecard/{pc_name}/{shop_name}/{url}/{pc_type}/{artists_id}/" +
+                "{official_sources_id}", ctx -> {
+            String pcName = ctx.pathParam("pc_name");
+            String shopName = ctx.pathParam("shop_name");
+            String url = ctx.pathParam("url");
+            String pcType = ctx.pathParam("pc_type");
+            int artistsId = Integer.parseInt(ctx.pathParam("artists_id"));
+            int officialSourcesId = Integer.parseInt(ctx.pathParam("official_sources_id"));
+
+            Photocard photocard = new Photocard();
+            photocard.setPc_name(pcName);
+            photocard.setShop_name(shopName);
+            photocard.setUrl(url);
+            photocard.setPc_type(PC_type.fromString(pcType));
+            photocard.setArtists_id(artistsId);
+            photocard.setOfficial_sources_id(officialSourcesId);
+
+            // Enregistrement de la carte via le service
+            userService.proposePhotocard(photocard);
+
+            // Retourne une réponse avec statut 201
             ctx.status(201).result("Photocard proposed successfully");
         });
+
 
         //--------------- ADMIN Methods ---------------
 

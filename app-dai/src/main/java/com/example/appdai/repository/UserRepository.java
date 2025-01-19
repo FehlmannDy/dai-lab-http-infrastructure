@@ -128,7 +128,6 @@ public class UserRepository {
         if (photocard.getPc_name() == null || photocard.getPc_name().isEmpty() || photocard.getPc_type() == null || photocard.getUrl() == null) {
             throw new IllegalArgumentException("Every field is required but shop name is optional");
         }
-
         String query = "INSERT INTO photocards (pc_name, shop_name, url, pc_type, proposed, artists_id, official_sources_id) " +
                 "VALUES (?, ?, ?, CAST(? AS pc_type_enum), TRUE, ?, ?)";
 
