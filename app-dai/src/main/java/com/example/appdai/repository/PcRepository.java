@@ -184,7 +184,17 @@ public class PcRepository {
                 "WHERE g.groups_id = (SELECT ga.groups_id FROM groups_artists ga WHERE ga.artists_id = ?)";
 
         try {
-            return jdbcTemplate.queryForObject(query, new Object[]{artistId}, String.class);
+
+            return jdbcTemplate.query(conn -> {
+                PreparedStatement stmt = conn.prepareStatement(query);
+                stmt.setInt(1, artistId);
+                return stmt;
+            }, rs -> {
+                if (rs.next()) {
+                    return rs.getString("groups_name");
+                }
+                return null;
+            });
         } catch (EmptyResultDataAccessException e) {
             System.err.println("Aucun groupe trouvé pour l'artiste avec l'ID : " + artistId);
             return null; // Ou retournez une chaîne par défaut, ex. "Inconnu"
@@ -214,6 +224,28 @@ public class PcRepository {
                 photocard.setOfficial_sources_id(rs.getInt("official_sources_id"));
                 return photocard;
             });
+        } catch (DataAccessException e) {
+            System.err.println("Erreur lors de l'exécution de la requête : " + e.getMessage());
+            return List.of();
+        }
+    }
+
+    /**
+     * Retrieves a list of results based on a search term.
+     *
+     * @param searchTerm the term to search in the `stage_name`, `groups_name`, `pc_name`, and `shop_name`.
+     * @return a list of maps where each map represents a row of the query result.
+     */
+    public List<Map<String, Object>> searchPhotocardsByTerm(String searchTerm) {
+        String query = "SELECT * FROM all_names_to_search WHERE " +
+                "artist_name ILIKE ? OR " +
+                "group_name ILIKE ? OR " +
+                "pc_name ILIKE ? OR " +
+                "shop_name ILIKE ?";
+        String searchPattern = "%" + searchTerm + "%";
+
+        try {
+            return jdbcTemplate.queryForList(query, new Object[]{searchPattern, searchPattern, searchPattern, searchPattern});
         } catch (DataAccessException e) {
             System.err.println("Erreur lors de l'exécution de la requête : " + e.getMessage());
             return List.of();

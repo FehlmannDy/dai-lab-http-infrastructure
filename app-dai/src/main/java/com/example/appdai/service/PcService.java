@@ -86,4 +86,7 @@ public class PcService {
     }
 
 
+    public List<Map<String, Object>> searchPhotocardsByTerm(String searchTerm) {
+        return pcRepository.searchPhotocardsByTerm(searchTerm);
+    }
 }

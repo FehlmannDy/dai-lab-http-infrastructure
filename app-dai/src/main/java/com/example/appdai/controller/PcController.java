@@ -151,6 +151,30 @@ public class PcController {
             }
         });
 
+        // Fetches photocards for a specific search term
+        app.get("/api/photocards/search", ctx -> {
+            try {
+                String searchTerm = ctx.queryParam("searchTerm");
+
+                if (searchTerm == null || searchTerm.trim().isEmpty()) {
+                    ctx.status(400).result("Search term cannot be empty.");
+                    return;
+                }
+
+                List<Map<String, Object>> results = cardService.searchPhotocardsByTerm(searchTerm);
+
+                if (results != null && !results.isEmpty()) {
+                    ctx.status(200).json(results);
+                } else {
+                    ctx.status(404).result("No photocards found matching the search term");
+                }
+            } catch (Exception e) {
+                ctx.status(500).result("Unexpected error occurred");
+            }
+        });
+
+
+
 //        app.get("/api/artists/{groupsName}",ctx->{
 //            String groupsName = ctx.pathParam("groupsName");
 //            List<Artist> artists = cardService.getGroupArtists(groupsName);
