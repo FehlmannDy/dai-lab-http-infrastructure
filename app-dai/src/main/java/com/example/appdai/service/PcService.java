@@ -39,7 +39,8 @@ public class PcService {
 
     public List<Map<String, Object>> getPaginatedPcs(Integer groupId, int page, int size) {
         int offset = (page - 1) * size;
-        return pcRepository.getPaginatedPcs(groupId, size, offset);
+        return pcRepository.getPaginatedPcs(groupId, page, offset);
     }
+
 
 }
