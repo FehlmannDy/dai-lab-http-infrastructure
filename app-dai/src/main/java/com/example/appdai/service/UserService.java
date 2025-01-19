@@ -1,6 +1,7 @@
 package com.example.appdai.service;
 
 import com.example.appdai.model.PC_type;
+import com.example.appdai.model.Photocard;
 import com.example.appdai.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +27,12 @@ public class UserService {
         userRepository.deletePcFromUserList(userId, photocardId);
     }
 
-    public List<Map<String, Object>> getUserWishlist(int userId) {
-        return userRepository.getUserWishlist(userId);
+    public List<Photocard> getUserWishlist(int userId) {
+        return userRepository.getUserCollection(userId,false);
     }
 
-    public List<Map<String, Object>> getUserCollection(int userId) {
-        return userRepository.getUserCollection(userId);
+    public List<Photocard> getUserCollection(int userId) {
+        return userRepository.getUserCollection(userId,true);
     }
 
     public void proposePhotocard(String name, String shopName, String imageUrl, String pcType, Integer artistId,

@@ -69,7 +69,7 @@ public class UserController {
         // Get the wishlist of a user by userId
         app.get("/api/users/{userId}/wishlist", ctx -> {
             int userId = Integer.parseInt(ctx.pathParam("userId"));
-            List<Map<String, Object>> photocards = userService.getUserWishlist(userId);
+            List<Photocard> photocards = userService.getUserWishlist(userId);
             if (photocards != null && !photocards.isEmpty()) {
                 ctx.status(200).json(photocards);
             }else{
@@ -80,7 +80,7 @@ public class UserController {
         // Get the collection of a user by userId
         app.get("/api/users/{userId}/collection", ctx -> {
             int userId = Integer.parseInt(ctx.pathParam("userId"));
-            List<Map<String, Object>> photocards = userService.getUserCollection(userId);
+            List<Photocard> photocards = userService.getUserCollection(userId);
             if (photocards != null && !photocards.isEmpty()) {
                 ctx.status(200).json(photocards);
             }else{

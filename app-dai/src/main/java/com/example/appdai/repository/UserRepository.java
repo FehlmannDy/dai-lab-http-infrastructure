@@ -8,10 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /*
 Le package repository contient :
@@ -79,46 +76,34 @@ public class UserRepository {
     }
 
     /**
-     * Get the wishlist of a user
-     * @param userId user ID
-     * @return a list of maps containing the photocard ID and name (Will be changed to model)
-     */
-    public List<Map<String, Object>> getUserWishlist(int userId) {
-        String query = "SELECT p.pc_id, p.pc_name " +
+     * Récupère la collection de photocards d'un utilisateur spécifique en fonction de son statut "have" (possédé ou non).
+     *
+     * @param userId l'identifiant de l'utilisateur pour lequel récupérer la collection.
+     * @param have un indicateur booléen qui spécifie si les photocards récupérées sont possédées (true) ou non (false).
+     * @return une liste de {@link Photocard} représentant les photocards de la collection de l'utilisateur.
+     *         Retourne une liste vide si aucune photocard ne correspond ou en cas d'erreur.
+     * @throws DataAccessException en cas de problème d'accès à la base de données (géré en interne avec un retour de liste vide).
+     *
+     **/
+    public List<Photocard> getUserCollection(int userId, boolean have) {
+        String query = "SELECT p.pc_id, p.pc_name, p.shop_name, p.url, p.pc_type, p.artists_id, p.official_sources_id, a.stage_name, o.title " +
                 "FROM users_photocard_list upl " +
                 "JOIN photocards p ON upl.pc_id = p.pc_id " +
-                "WHERE upl.user_id = ? AND upl.have = FALSE";
+                "JOIN artists a ON p.artists_id = a.artists_id " +
+                "JOIN official_sources o ON p.official_sources_id = o.official_sources_id " +
+                "WHERE upl.user_id = ? AND upl.have = ?";
 
         try {
-            return jdbcTemplate.query(query, new Object[]{userId}, (rs, rowNum) -> {
-                Map<String, Object> wishlistItem = new HashMap<>();
-                wishlistItem.put("pc_id", rs.getInt("pc_id"));
-                wishlistItem.put("pc_name", rs.getString("pc_name"));
-                return wishlistItem;
-            });
-        } catch (DataAccessException e) {
-            System.err.println("Erreur lors de la récupération de la wishlist : " + e.getMessage());
-            return List.of();
-        }
-    }
-
-    /**
-     * Get the collection of a user
-     * @param userId user ID
-     * @return a list of maps containing the photocard ID and name (Will be changed to model)
-     */
-    public List<Map<String, Object>> getUserCollection(int userId) {
-        String query = "SELECT p.pc_id, p.pc_name " +
-                "FROM users_photocard_list upl " +
-                "JOIN photocards p ON upl.pc_id = p.pc_id " +
-                "WHERE upl.user_id = ? AND upl.have = TRUE";
-
-        try {
-            return jdbcTemplate.query(query, new Object[]{userId}, (rs, rowNum) -> {
-                Map<String, Object> wishlistItem = new HashMap<>();
-                wishlistItem.put("pc_id", rs.getInt("pc_id"));
-                wishlistItem.put("pc_name", rs.getString("pc_name"));
-                return wishlistItem;
+            return jdbcTemplate.query(query, new Object[]{userId,have}, (rs, rowNum) -> {
+                Photocard photocard = new Photocard();
+                photocard.setPc_id(rs.getInt("pc_id"));
+                photocard.setPc_name(rs.getString("pc_name"));
+                photocard.setArtists_id(rs.getInt("artists_id"));
+                photocard.setOfficial_sources_id(rs.getInt("official_sources_id"));
+                photocard.setUrl(rs.getString("url"));
+                photocard.setShop_name(rs.getString("shop_name"));
+                photocard.setProposed(false);
+                return photocard;
             });
         } catch (DataAccessException e) {
             System.err.println("Erreur lors de la récupération de la wishlist : " + e.getMessage());

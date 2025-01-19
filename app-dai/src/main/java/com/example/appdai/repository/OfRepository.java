@@ -80,11 +80,11 @@ public class OfRepository {
         }
     }
 
-    public boolean validSource(int officialSourceId){
+    public boolean validSource(int officialSourceId, boolean proposed){
         String query = "UPDATE official_sources SET proposed = ? WHERE id = ?";
 
         try{
-            int updateRows = jdbcTemplate.update(query,officialSourceId);
+            int updateRows = jdbcTemplate.update(query,proposed,officialSourceId);
             return updateRows > 0;
         }catch (DataAccessException e){
             System.err.println("Erreur de la validité de l'official source : " + e.getMessage());

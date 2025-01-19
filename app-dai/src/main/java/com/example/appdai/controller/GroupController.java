@@ -10,6 +10,7 @@ import com.example.appdai.service.GroupService;
 import java.util.List;
 import java.util.Map;
 import java.time.LocalDate;
+import java.util.stream.Collectors;
 
 /*
 Le package controller regroupe toutes les classes responsables de gérer les requêtes HTTP (les endpoints).
@@ -32,9 +33,13 @@ public class GroupController {
 
         // Get the list of all groups names for the dropdown menu
         app.get("/api/groupslist", ctx -> {
-            List<Map<String, Object>> groups = groupService.getAllGroupNames();
-            if (!groups.isEmpty()) {
-                ctx.status(200).json(groups);
+            List<Group> groups = groupService.getAllGroupNames();
+            List<String> groupNames = groups.stream()
+                    .map(Group::getGroups_name)
+                    .collect(Collectors.toList());
+
+            if (!groupNames.isEmpty()) {
+                ctx.status(200).json(groupNames);
             } else {
                 ctx.status(404).result("No groups found");
             }

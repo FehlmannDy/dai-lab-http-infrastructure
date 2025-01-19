@@ -34,16 +34,6 @@ public class GroupRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-//    public List<Map<String, Object>> searchGroupsByName(String name) {
-//        String query = "SELECT groups_id, groups_name FROM groups WHERE groups_name LIKE ?";
-//        return jdbcTemplate.queryForList(query, "%" + name + "%");
-//    }
-
-    public List<Map<String, Object>> getAllGroupNames() {
-        String query = "SELECT groups_id, groups_name FROM groups";
-        return jdbcTemplate.queryForList(query);
-    }
-
     public List<Map<String, Object>> getArtistsByGroupId(int groupId) {
         String query = "SELECT a.artists_id, a.stage_name " +
                 "FROM artists a " +
@@ -70,7 +60,7 @@ public class GroupRepository {
     }
 
     public List<Group> getAllGroups(){
-        String query = "SELECT * FROM groups";
+        String query = "SELECT * FROM groups WHERE proposed = FALSE";
         try {
             return jdbcTemplate.query(query, (rs, rowNum) -> {
                 Group group = new Group();
