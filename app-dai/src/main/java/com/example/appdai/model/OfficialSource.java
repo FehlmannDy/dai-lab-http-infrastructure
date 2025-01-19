@@ -7,23 +7,12 @@
  */
 package com.example.appdai.model;
 
-/**
- * Type Enum
- * This enum is used to represent the type of official source.
- * An official source can be an album, an event or any other type of source.
- */
-enum Type {
-    ALBUM,
-    OTHER,
-    EVENT
-}
-
 public class OfficialSource {
 
     private int official_sources_id;
     private String title;
     private String version_name;
-    private Type type;
+    private OF_type type;
     private boolean proposed;
 
     /**
@@ -38,7 +27,7 @@ public class OfficialSource {
      * @param title Title of the official source
      * @param type Type of the official source
      */
-    public OfficialSource(int id,String title, Type type){
+    public OfficialSource(int id,String title, OF_type type){
         this.official_sources_id = id;
         this.title = title;
         this.version_name = null;
@@ -53,7 +42,7 @@ public class OfficialSource {
      * @param versionName Version name of the official source
      * @param type Type of the official source
      */
-    public OfficialSource(int id,String title,String versionName, Type type){
+    public OfficialSource(int id,String title,String versionName, OF_type type){
         this.official_sources_id = id;
         this.title = title;
         this.version_name = versionName;
@@ -82,10 +71,10 @@ public class OfficialSource {
         this.version_name = version_name
         ;}
 
-    public Type getType() {
+    public OF_type getType() {
         return type;
     }
-    public void setType(Type type){
+    public void setType(OF_type type){
         this.type = type;
     }
 

@@ -76,7 +76,6 @@ public class GroupRepository {
                 Group group = new Group();
                 group.setGroups_id(rs.getInt("groups_id"));
                 group.setGroups_name(rs.getString("groups_name"));
-                group.setBeginDate(rs.getDate("begin_date"));
                 group.setGender(rs.getString("gender"));
                 return group;
             });
@@ -111,7 +110,6 @@ public class GroupRepository {
                 Artist artist = new Artist();
                 artist.setArtists_id(rs.getInt("artist_id"));
                 artist.setStage_name(rs.getString("stage_name"));
-                artist.setBirthDate(rs.getDate("birth_date"));
                 artist.setActive(rs.getBoolean("active"));
                 return artist;
             });
