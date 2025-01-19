@@ -66,7 +66,6 @@ public class GroupRepository {
                 Group group = new Group();
                 group.setGroups_id(rs.getInt("groups_id"));
                 group.setGroups_name(rs.getString("groups_name"));
-                group.setGender(rs.getString("gender"));
                 return group;
             });
         } catch (Exception e) {

@@ -34,12 +34,8 @@ public class GroupController {
         // Get the list of all groups names for the dropdown menu
         app.get("/api/groupslist", ctx -> {
             List<Group> groups = groupService.getAllGroupNames();
-            List<String> groupNames = groups.stream()
-                    .map(Group::getGroups_name)
-                    .collect(Collectors.toList());
-
-            if (!groupNames.isEmpty()) {
-                ctx.status(200).json(groupNames);
+            if (!groups.isEmpty()) {
+                ctx.status(200).json(groups);
             } else {
                 ctx.status(404).result("No groups found");
             }
