@@ -2,11 +2,8 @@ package com.example.appdai.repository;
 
 import com.example.appdai.model.Artist;
 import com.example.appdai.model.Group;
-import com.example.appdai.model.OfficialSource;
-import com.example.appdai.model.Photocard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -77,8 +74,8 @@ public class GroupRepository {
         try {
             return jdbcTemplate.query(query, (rs, rowNum) -> {
                 Group group = new Group();
-                group.setGroupsId(rs.getInt("groups_id"));
-                group.setGroupsName(rs.getString("groups_name"));
+                group.setGroups_id(rs.getInt("groups_id"));
+                group.setGroups_name(rs.getString("groups_name"));
                 group.setBeginDate(rs.getDate("begin_date"));
                 group.setGender(rs.getString("gender"));
                 return group;
@@ -112,8 +109,8 @@ public class GroupRepository {
         try {
             return jdbcTemplate.query(query, new Object[]{groupsName}, (rs, rowNum) -> {
                 Artist artist = new Artist();
-                artist.setArtistsId(rs.getInt("artist_id"));
-                artist.setStageName(rs.getString("stage_name"));
+                artist.setArtists_id(rs.getInt("artist_id"));
+                artist.setStage_name(rs.getString("stage_name"));
                 artist.setBirthDate(rs.getDate("birth_date"));
                 artist.setActive(rs.getBoolean("active"));
                 return artist;

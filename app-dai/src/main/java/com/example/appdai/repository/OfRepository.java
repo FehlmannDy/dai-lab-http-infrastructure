@@ -1,15 +1,12 @@
 package com.example.appdai.repository;
 
 import com.example.appdai.model.*;
-import com.example.appdai.model.OfficialSource.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
-import java.util.List;
 
 /*
 Le package repository contient :
@@ -57,11 +54,11 @@ public class OfRepository {
 //        try{
 //            return jdbcTemplate.query(query,(rs, rowNum)->{
 //                OffcialSource officialsource = new OffcialSource();
-//                officialsource.setId(rs.getInt("officialSource_id"));
+//                officialsource.setOfficial_sources_id(rs.getInt("officialSource_id"));
 //                officialsource.setTitle(rs.getString("title"));
-//                officialsource.setVersionName(rs.getString("versionName"));
+//                officialsource.setVersion_name(rs.getString("versionName"));
 //                officialsource.setShopName(rs.getString("shopName"));
-//                officialsource.setType(rs.getType("type"));
+//                officialsource.setPc_type(rs.getPc_type("type"));
 //            });
 //
 //        }catch (Exception e){
@@ -74,7 +71,7 @@ public class OfRepository {
         String query = "INSERT INTO official_sources (title,version_name,release_date,type) VALUES (?,?,?,?)";
 
         try{
-            int insertRows = jdbcTemplate.update(query,officialSource.getTitle(),officialSource.getVersionName(), officialSource.getReleaseDate(), officialSource.getType());
+            int insertRows = jdbcTemplate.update(query,officialSource.getTitle(),officialSource.getVersion_name(), officialSource.getReleaseDate(), officialSource.getType());
             return insertRows > 0;
 
         }catch(DataAccessException e){
