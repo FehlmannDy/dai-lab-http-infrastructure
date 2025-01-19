@@ -25,8 +25,8 @@ public class GroupService {
         this.groupRepository = groupRepository;
     }
 
-    public List<Map<String, Object>> getAllGroupNames() {
-        return groupRepository.getAllGroupNames();
+    public List<Group> getAllGroupNames() {
+        return groupRepository.getAllGroups();
     }
 
     public List<Map<String, Object>> getArtistsByGroupId(int groupId) {
