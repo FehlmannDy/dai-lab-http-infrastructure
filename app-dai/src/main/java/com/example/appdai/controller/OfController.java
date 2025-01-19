@@ -52,21 +52,38 @@ public class OfController {
         // Proposes a new official source by accepting relevant data and passing it to the service layer.
         app.post("/api/officialsource/propose", ctx -> {
 
-            OfficialSource officialSource = ctx.bodyAsClass(OfficialSource.class);
+            String groupName = ctx.queryParam("groupName");
+            String title = ctx.queryParam("title");
+            String type = ctx.queryParam("type");  // Type devrait être une valeur de l'enum OF_type
+            String versionName = ctx.queryParam("version_name");
 
-            if (officialSource.getTitle() == null || officialSource.getVersion_name() == null || officialSource.getType() == null) {
-                ctx.status(400).result("Missing required fields");
+            if (groupName == null || groupName.isEmpty() || title == null || title.isEmpty() || type == null || type.isEmpty()) {
+                ctx.status(400).result("Missing required parameters");
+                return;
+            }
+
+            OfficialSource officialSource = new OfficialSource();
+            officialSource.setTitle(title);
+            officialSource.setVersion_name(versionName);
+
+            try {
+                if (type != null && !type.isEmpty()) {
+                    OF_type ofType = OF_type.valueOf(type.toUpperCase());
+                    officialSource.setType(ofType);
+                }
+            } catch (IllegalArgumentException e) {
+                ctx.status(400).result("Invalid type. Allowed values are: ALBUM, OTHER, EVENT");
                 return;
             }
 
             try {
                 ofService.proposeOfficialSource(officialSource);
                 ctx.status(201).result("Official source proposed successfully");
-            } catch (IllegalArgumentException e) {
-                ctx.status(404).result("Invalid PC type");
             } catch (Exception e) {
                 ctx.status(500).result("Unexpected error");
-            }});
+            }
+        });
+
 
         // Fetches official sources for a specific group by group name
         app.get("/api/groups/official-sources", ctx -> {
