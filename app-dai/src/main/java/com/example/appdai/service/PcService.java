@@ -80,9 +80,9 @@ public class PcService {
      * @param size The number of items per page.
      * @return A list of maps containing paginated photocards' data.
      */
-    public List<Map<String, Object>> getPaginatedPcs(Integer groupId, int page, int size) {
+    public List<Map<String, Object>> getPaginatedPcs(Integer groupId, Integer artistId, int page, int size) {
         int offset = (page - 1) * size;
-        return pcRepository.getPaginatedPcs(groupId, page, offset);
+        return pcRepository.getPaginatedPcs(groupId,artistId, page, offset);
     }
 
 

@@ -68,6 +68,9 @@ public class PcController {
                 String groupIdParam = ctx.queryParam("groupId");
                 Integer groupId = (groupIdParam != null && !groupIdParam.isEmpty()) ? Integer.parseInt(groupIdParam) : null;
 
+                String artistIdParam = ctx.queryParam("artistId");
+                Integer artistId = (artistIdParam != null && !artistIdParam.isEmpty()) ? Integer.parseInt(artistIdParam) : null;
+
                 int page = Integer.parseInt(ctx.queryParam("page") != null ? ctx.queryParam("page") : "1");
                 int size = Integer.parseInt(ctx.queryParam("size") != null ? ctx.queryParam("size") : "24");
 
@@ -76,7 +79,7 @@ public class PcController {
                     return;
                 }
 
-                List<Map<String, Object>> photocards = cardService.getPaginatedPcs(groupId, page, size);
+                List<Map<String, Object>> photocards = cardService.getPaginatedPcs(groupId, artistId, page, size);
 
                 if (photocards == null || photocards.isEmpty()) {
                     ctx.status(404).result("No photocards found for the given parameters");

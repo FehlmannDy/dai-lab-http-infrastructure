@@ -86,36 +86,51 @@ public class PcRepository {
      * @param size the number of photocards per page.
      * @return a list of photocards matching the given filters and pagination parameters.
      */
-public List<Map<String, Object>> getPaginatedPcs(Integer groupId, Integer page, Integer size) {
+    public List<Map<String, Object>> getPaginatedPcs(Integer groupId, Integer artistId, Integer page, Integer size) {
+        System.out.println("Received params: groupId=" + groupId + ", artistId=" + artistId + ", page=" + page + ", size=" + size);
 
-    System.out.println("Received params: groupId=" + groupId + ", page=" + page + ", size=" + size);
+        int pageNumber = (page == null || page < 1) ? 1 : page;
+        int pageSize = (size == null || size <= 0) ? 24 : size;
+        int pageOffset = (pageNumber - 1) * pageSize;
 
-    int pageNumber = (page == null || page < 1) ? 1 : page;
-    int pageSize = (size == null || size <= 0) ? 24 : size;
-    int pageOffset = (pageNumber - 1) * pageSize;
+        System.out.println("Calculated Offset: " + pageOffset);
 
-    String sql = """
-    SELECT 
-        p.pc_id, p.pc_name, p.url, p.pc_type, 
-        a.stage_name AS artist_name, 
-        g.groups_id AS group_id, g.groups_name AS group_name 
-    FROM photocards p 
-    JOIN artists a ON p.artists_id = a.artists_id 
-    JOIN groups_artists ga ON a.artists_id = ga.artists_id 
-    JOIN groups g ON ga.groups_id = g.groups_id 
-    """ + (groupId != null ? "WHERE g.groups_id = ? " : "")
-            + "ORDER BY p.pc_id LIMIT ? OFFSET ?";
+        // Construire la requête SQL dynamiquement
+        StringBuilder sql = new StringBuilder("""
+        SELECT 
+            p.pc_id, p.pc_name, p.url, p.pc_type, 
+            a.stage_name AS artist_name, 
+            g.groups_id AS group_id, g.groups_name AS group_name 
+        FROM photocards p 
+        JOIN artists a ON p.artists_id = a.artists_id 
+        JOIN groups_artists ga ON a.artists_id = ga.artists_id 
+        JOIN groups g ON ga.groups_id = g.groups_id 
+    """);
 
-    List<Object> params = new ArrayList<>();
-    if (groupId != null) {
-        params.add(groupId);
+        List<Object> params = new ArrayList<>();
+        boolean hasWhere = false;
+
+        if (groupId != null) {
+            sql.append("WHERE g.groups_id = ? ");
+            params.add(groupId);
+            hasWhere = true;
+        }
+
+        if (artistId != null) {
+            sql.append(hasWhere ? "AND " : "WHERE ");
+            sql.append("a.artists_id = ? ");
+            params.add(artistId);
+        }
+
+        sql.append("ORDER BY p.pc_id LIMIT ? OFFSET ?");
+
+        params.add(pageSize);
+        params.add(pageOffset);
+
+        System.out.println("Final Params: " + params);
+
+        return jdbcTemplate.queryForList(sql.toString(), params.toArray());
     }
-    params.add(pageSize);
-    params.add(pageOffset);
-
-    return jdbcTemplate.queryForList(sql, params.toArray());
-}
-
     /**
      * Retrieves all photocards with their type, including additional information about the source and artist.
      *
