@@ -1,12 +1,17 @@
-/**
- * OfficialSource Class
- * This class is used to represent an official source of information.
- * An official source has an official_sources_id, a title, a version name, a release date and a type.
- * An official source can be an album, an event or any other type of source.
- * The proposed status is used to know if the artist is proposed by a user or not.
- */
 package com.example.appdai.model;
 
+/**
+ * Represents an official source.
+ *
+ * <p>An official source has the following attributes:</p>
+ * <ul>
+ *   <li><b>official_sources_id</b>: The unique identifier for the official source.</li>
+ *   <li><b>title</b>: The title of the official source.</li>
+ *   <li><b>version_name</b>: The version name associated with the official source.</li>
+ *   <li><b>type</b>: The type of the official source, represented by an {@link OF_type} enum.</li>
+ *   <li><b>proposed</b>: A boolean indicating whether the official source was proposed by a user or not.</li>
+ * </ul>
+ */
 public class OfficialSource {
 
     private int official_sources_id;
@@ -16,7 +21,7 @@ public class OfficialSource {
     private boolean proposed;
 
     /**
-     * Default Constructor
+     * Default constructor
      */
     public OfficialSource() {
     }
@@ -49,7 +54,10 @@ public class OfficialSource {
         this.type = type;
     }
 
-    // Getters and Setters
+    /**
+     * Getters and Setters
+     */
+
     public int getOfficial_sources_id() {
         return official_sources_id;
     }
@@ -83,5 +91,21 @@ public class OfficialSource {
     }
     public void setProposed(boolean proposed) {
         this.proposed = proposed;
+    }
+
+    /**
+     * Provides a string representation of the official source.
+     *
+     * @return a string describing the official source with all its attributes
+     */
+    @Override
+    public String toString() {
+        return "OfficialSource{" +
+                "official_sources_id=" + official_sources_id +
+                ", title='" + title + '\'' +
+                ", version_name='" + version_name + '\'' +
+                ", type=" + type +
+                ", proposed=" + proposed +
+                '}';
     }
 }

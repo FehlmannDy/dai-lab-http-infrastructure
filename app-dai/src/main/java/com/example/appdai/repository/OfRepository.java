@@ -8,37 +8,45 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 
-/*
-Le package repository contient :
-
-    Les classes d'accès aux données (via JDBC).
-    Ces classes interagissent directement avec ta base de données pour créer,
-    lire, mettre à jour ou supprimer des données (CRUD).
-
-    En bas y a des exemples mais faudra faire des prepared statements
+/**
+ * Repository class for accessing data related to official sources in the database.
+ * This class interacts directly with the database using JDBC to perform CRUD operations for official sources.
+ *
+ * <p>It contains methods to propose, add, and validate official sources in the database.</p>
+ *
+ * The class uses {@link JdbcTemplate} to execute SQL queries and manage database connections.
  */
 @Repository
 public class OfRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * Constructs a new {@code OfRepository} instance.
+     *
+     * @param jdbcTemplate the {@link JdbcTemplate} used to execute SQL queries.
+     */
     @Autowired
     public OfRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    // proposeOfficialSource
-    public void proposeOfficialSource(String title, String versionName, String releaseDate, PC_type type) {
-        String query = "INSERT INTO official_sources (title, version_name, release_date, type, proposed) " +
-                "VALUES (?, ?, ?, ?, TRUE)";
+    /**
+     * Proposes an official source by inserting its details into the database.
+     *
+     * @param officialSource is the OfficialSource
+     * @throws RuntimeException if there is an error while proposing the official source.
+     */
+    public void proposeOfficialSource(OfficialSource officialSource) {
+        String query = "INSERT INTO official_sources (title, version_name, type, proposed) " +
+                "VALUES (?, ?, ?, TRUE)";
 
         try {
             jdbcTemplate.update(connection -> {
                 PreparedStatement stmt = connection.prepareStatement(query);
-                stmt.setString(1, title);
-                stmt.setString(2, releaseDate);
-                stmt.setString(3, versionName);
-                stmt.setString(4, type.toString());
+                stmt.setString(1, officialSource.getTitle());
+                stmt.setString(2, officialSource.getVersion_name());
+                stmt.setString(3, officialSource.getType().toString());
                 return stmt;
             });
         } catch (DataAccessException e) {
@@ -67,6 +75,12 @@ public class OfRepository {
 //        }
 //    }
 
+    /**
+     * Adds a new official source to the database.
+     *
+     * @param officialSource the official source to be added.
+     * @return {@code true} if the source was added successfully, otherwise {@code false}.
+     */
     public boolean addSource(OfficialSource officialSource){
         String query = "INSERT INTO official_sources (title,version_name,release_date,type) VALUES (?,?,?,?)";
 
@@ -80,6 +94,13 @@ public class OfRepository {
         }
     }
 
+    /**
+     * Updates the "proposed" status of an official source in the database.
+     *
+     * @param officialSourceId the ID of the official source to be updated.
+     * @param proposed         the proposed status to set.
+     * @return {@code true} if the update was successful, otherwise {@code false}.
+     */
     public boolean validSource(int officialSourceId, boolean proposed){
         String query = "UPDATE official_sources SET proposed = ? WHERE id = ?";
 
@@ -91,4 +112,6 @@ public class OfRepository {
             return false;
         }
     }
+
+    //TODO supprimer la source non valide
 }

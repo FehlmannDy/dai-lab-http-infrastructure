@@ -1,11 +1,17 @@
-/**
- * Artist Class
- * This class is used to represent an artist in the system.
- * An artist has an id, a stage name, a birthdate, an active status and a proposed status.
- * The proposed status is used to know if the artist is proposed by a user or not.
- */
 package com.example.appdai.model;
 
+/**
+ * Represents an artist.
+ *
+ * An artist has the following attributes:
+ *
+ * <ul>
+ *   <li><b>artists_id</b>: The unique identifier of the artist.</li>
+ *   <li><b>stage_name</b>: The stage name of the artist.</li>
+ *   <li><b>active</b>: The active status of the artist, indicating if they are currently active.</li>
+ *   <li><b>proposed</b>: A boolean indicating if the artist is proposed by a user or not.</li>
+ * </ul>
+ */
 public class Artist {
 
     private int artists_id;
@@ -14,16 +20,18 @@ public class Artist {
     private boolean proposed;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public Artist() {
     }
 
     /**
-     * Constructor with all the attributes except the proposed status
-     * @param artistsId the id of the artist
+     * Constructs an artist object with the specified attributes, except the proposed status.
+     * By default, the proposed status is set to true.
+     *
+     * @param artistsId the unique identifier of the artist
      * @param stageName the stage name of the artist
-     * @param active the active status of the artist
+     * @param active    the active status of the artist
      */
     public Artist(int artistsId, String stageName, boolean active) {
         this.artists_id = artistsId;
@@ -32,7 +40,10 @@ public class Artist {
         this.proposed = true;
     }
 
-    // Getters and Setters
+    /**
+     * Getters and Setters
+     */
+
     public int getArtists_id() {
         return artists_id;
     }
@@ -61,6 +72,11 @@ public class Artist {
         this.proposed = proposed;
     }
 
+    /**
+     * Provides a string representation of the artist.
+     *
+     * @return a string describing the artist with all its attributes
+     */
     @Override
     public String toString() {
         return "Artist{" +

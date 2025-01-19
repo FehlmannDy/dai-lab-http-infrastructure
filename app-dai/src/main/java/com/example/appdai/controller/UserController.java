@@ -1,38 +1,58 @@
 package com.example.appdai.controller;
 
-import com.example.appdai.model.Artist;
-import com.example.appdai.model.Group;
-import com.example.appdai.model.PC_type;
 import com.example.appdai.service.UserService;
 import io.javalin.Javalin;
 import org.springframework.stereotype.Component;
 import com.example.appdai.model.Photocard;
-import com.example.appdai.service.PcService;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/*
-Le package controller regroupe toutes les classes responsables de gérer les requêtes HTTP (les endpoints).
-Chaque controller correspond généralement à une entité ou une ressource spécifique.
-
-Exemple :
-    UserController : Gère les routes liées aux utilisateurs.
- */
+/**
+ * Controller class responsible for handling HTTP requests related to users and their photocards.
+ *
+ * This class defines various routes for managing users' wishlist, collection, and proposed photocards.
+ * It provides endpoints to add, update, delete, and retrieve photocards from a user's wishlist and collection.
+ * It also supports the functionality for proposing, accepting, and rejecting photocards.
+ *
+ **/
 @Component
 public class UserController {
 
     private final Javalin app;
     private final UserService userService;
 
-
+    /**
+     * Constructs a new {@code UserController} with the specified Javalin app and {@link UserController}.
+     *
+     * @param app the Javalin application instance used to register routes
+     * @param service the service layer responsible for group-related operations
+     */
     public UserController(Javalin app, UserService service) {
         this.app = app;
         this.userService = service;
     }
 
+    /**
+     * Registers all the routes for the UserController.
+     * <p>
+     * This method defines the various endpoints for handling user and photocard related requests.
+     * </p>
+     *
+     * <ul>
+     *   <li>POST /api/users/{userId}/photocards: Adds or updates a photocard in the user's wishlist or collection.</li>
+     *   <li>DELETE /api/users/{userId}/photocards/{photocardId}: Deletes a photocard from the user's wishlist or collection.</li>
+     *   <li>GET /api/users/{userId}/wishlist: Retrieves the user's wishlist.</li>
+     *   <li>GET /api/users/{userId}/collection: Retrieves the user's collection.</li>
+     *   <li>POST /api/photocards/proposecard: Proposes a new photocard.</li>
+     *   <li>PATCH /api/admin/accept: Accepts proposed photocards.</li>
+     *   <li>PATCH /api/admin/reject: Rejects proposed photocards.</li>
+     * </ul>
+     *
+     * @param app the Javalin app instance used to register the routes
+     */
     public void registerRoutes(Javalin app) {
 
         // Add or update a photocard in the wishlist/collection
@@ -64,8 +84,6 @@ public class UserController {
             ctx.status(204).result("Photocard removed from user list");
         });
 
-
-
         // Get the wishlist of a user by userId
         app.get("/api/users/{userId}/wishlist", ctx -> {
             int userId = Integer.parseInt(ctx.pathParam("userId"));
@@ -89,19 +107,12 @@ public class UserController {
         });
 
         app.post("/api/photocards/proposecard", ctx -> {
-            Map<String, Object> body = ctx.bodyAsClass(Map.class);
-
-            String pcName = (String) body.get("pcName");
-            String pcType = (String) body.get("pcType");
-            String imageUrl = (String) body.get("imageUrl");
-            Integer artistId = (Integer) body.get("artistId");
-            Integer sourceId = (Integer) body.get("sourceId");
-            String shopName = (String) body.get("shopName");
-
-            userService.proposePhotocard(pcName, shopName, imageUrl, pcType, artistId, sourceId);
+            Photocard body = ctx.bodyAsClass(Photocard.class);
+            userService.proposePhotocard(body);
             ctx.status(201).result("Photocard proposed successfully");
         });
 
+        //--------------- ADMIN Methods ---------------
 
         // Accept proposed photocards
         app.patch("/api/admin/accept", ctx -> {
@@ -130,10 +141,6 @@ public class UserController {
             userService.rejectProposedPhotocard(photocardIds);
             ctx.status(200).result("Proposed photocards rejected");
         });
-
-
-
-
 
 
 //
