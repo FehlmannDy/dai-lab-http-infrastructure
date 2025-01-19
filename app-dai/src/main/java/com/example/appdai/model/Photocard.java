@@ -1,20 +1,20 @@
 /**
  * Photocard Class
  * This class is used to create Photocard objects
- * A Photocard is composed of an ID, a name, a shopName, an image URL, a type, an artist ID and a source ID
+ * A Photocard is composed of an ID, a pc_name, a shopName, an image URL, a pc_type, an artist ID and a source ID
  * The proposed status is used to know if the artist is proposed by a user or not.
  */
 package com.example.appdai.model;
 
 public class Photocard {
 
-    private int id;                 // ID unique de la carte
-    private String name;            // Nom de la carte
-    private String shopName;        // if not null = Benefit
-    private String imageUrl;        // URL de l'image
-    private PC_type type;            // Type de la carte (PCA, POB, etc.)
-    private int artistId;           // ID de l'artiste (FK)
-    private int sourceId;           // ID de la source officielle (FK)
+    private int pc_id;                 // ID unique de la carte
+    private String pc_name;            // Nom de la carte
+    private String shop_name;        // if not null = Benefit
+    private String url;        // URL de l'image
+    private PC_type pc_type;            // Type de la carte (PCA, POB, etc.)
+    private int artists_id;           // ID de l'artiste (FK)
+    private int official_sources_id;           // ID de la source officielle (FK)
     private boolean proposed;       // Indique si la carte est proposée
 
 
@@ -34,13 +34,13 @@ public class Photocard {
      * @param sourceId ID of the official source (FK)
      */
     public Photocard(int id, String name, String imageUrl, PC_type type, int artistId, int sourceId) {
-        this.id = id;
-        this.name = name;
-        this.shopName = null;
-        this.imageUrl = imageUrl;
-        this.type = type;
-        this.artistId = artistId;
-        this.sourceId = sourceId;
+        this.pc_id = id;
+        this.pc_name = name;
+        this.shop_name = null;
+        this.url = imageUrl;
+        this.pc_type = type;
+        this.artists_id = artistId;
+        this.official_sources_id = sourceId;
         this.proposed = true;
     }
 
@@ -48,47 +48,79 @@ public class Photocard {
      * Constructor with shopName
      * @param id ID of the Photocard
      * @param name Name of the Photocard
-     * @param shopName Shop name of the Photocard
+     * @param shopName Shop pc_name of the Photocard
      * @param imageUrl Image URL of the Photocard
      * @param type Type of the Photocard
      * @param artistId ID of the artist (FK)
      * @param sourceId ID of the official source (FK)
      */
     public Photocard(int id, String name, String shopName, String imageUrl, PC_type type, int artistId, int sourceId) {
-        this.id = id;
-        this.name = name;
-        this.shopName = shopName;
-        this.imageUrl = imageUrl;
-        this.type = type;
-        this.artistId = artistId;
-        this.sourceId = sourceId;
+        this.pc_id = id;
+        this.pc_name = name;
+        this.shop_name = shopName;
+        this.url = imageUrl;
+        this.pc_type = type;
+        this.artists_id = artistId;
+        this.official_sources_id = sourceId;
         this.proposed = true;
     }
 
     // Getters et Setters
-    public int getId() {return id;}
-    public void setId(int id) {this.id = id;}
+    public int getPc_id() {
+        return pc_id;
+    }
+    public void setPc_id(int pc_id) {
+        this.pc_id = pc_id;
+    }
 
-    public String getName() {return name;}
-    public void setName(String name) {this.name = name;}
+    public String getPc_name() {
+        return pc_name;
+    }
+    public void setPc_name(String pc_name) {
+        this.pc_name = pc_name;
+    }
 
-    public String getShopName() {return shopName;}
-    public void setShopName(String shopName) {this.shopName = shopName;}
+    public String getShop_name() {
+        return shop_name;
+    }
+    public void setShop_name(String shop_name) {
+        this.shop_name = shop_name;
+    }
 
-    public String getImageUrl() {return imageUrl;}
-    public void setImageUrl(String imageUrl) {this.imageUrl = imageUrl;}
+    public String getUrl() {
+        return url;
+    }
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-    public PC_type getType() {return type;}
-    public void setType(PC_type type) {this.type = type;}
+    public PC_type getPc_type() {
+        return pc_type;
+    }
+    public void setPc_type(PC_type pc_type) {
+        this.pc_type = pc_type;
+    }
 
-    public int getArtistId() {return artistId;}
-    public void setArtistId(int artistId) {this.artistId = artistId;}
+    public int getArtists_id() {
+        return artists_id;
+    }
+    public void setArtists_id(int artists_id) {
+        this.artists_id = artists_id;
+    }
 
-    public int getSourceId() {return sourceId;}
-    public void setSourceId(int sourceId) {this.sourceId = sourceId;}
+    public int getOfficial_sources_id() {
+        return official_sources_id;
+    }
+    public void setOfficial_sources_id(int official_sources_id) {
+        this.official_sources_id = official_sources_id;
+    }
 
-    public boolean isProposed() {return proposed;}
-    public void setProposed(boolean proposed) {this.proposed = proposed;}
+    public boolean isProposed() {
+        return proposed;
+    }
+    public void setProposed(boolean proposed) {
+        this.proposed = proposed;
+    }
 
     /**
      * toString Method
@@ -98,13 +130,13 @@ public class Photocard {
     @Override
     public String toString() {
         return "PhotoCard{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", shopName='" + shopName + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", type='" + type + '\'' +
-                ", artistId=" + artistId +
-                ", sourceId=" + sourceId +
+                "pc_id=" + pc_id +
+                ", pc_name='" + pc_name + '\'' +
+                ", shopName='" + shop_name + '\'' +
+                ", url='" + url + '\'' +
+                ", pc_type='" + pc_type + '\'' +
+                ", artists_id=" + artists_id +
+                ", official_sources_id=" + official_sources_id +
                 '}';
     }
 }
