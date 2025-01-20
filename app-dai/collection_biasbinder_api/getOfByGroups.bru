@@ -1,0 +1,15 @@
+meta {
+  name: getOfByGroups
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:7070/api/groups/official-sources?groupName=ATEEZ
+  body: none
+  auth: none
+}
+
+params:query {
+  groupName: ATEEZ
+}

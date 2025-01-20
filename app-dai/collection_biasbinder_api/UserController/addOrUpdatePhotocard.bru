@@ -1,0 +1,16 @@
+meta {
+  name: addOrUpdatePhotocard
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:7070/api/users/{userId}/photocards
+  body: formUrlEncoded
+  auth: none
+}
+
+body:form-urlencoded {
+  photocardId: 
+  have: 
+}

@@ -1,95 +1,87 @@
 package com.example.appdai.model;
 
-import java.util.Date;
-
+/**
+ * Represents a group.
+ *
+ * A group has the following attributes:
+ *
+ * <ul>
+ *   <li><b>groups_id</b>: The unique identifier of the group.</li>
+ *   <li><b>groups_name</b>: The name of the group.</li>
+ *   <li><b>gender</b>: Gender indicating if is a boys-bands or girls-bands.</li>
+ *   <li><b>proposed</b>: A boolean indicating if the group is proposed by a user or not.</li>
+ * </ul>
+ */
 public class Group {
 
-    private int groupsId;
-    private String groupsName;
-    private char gender;
-    private String label;
-    private Date beginDate;
-    private Date disbandDate;
+    private int groups_id;
+    private String groups_name;
+    private String gender;
     private boolean proposed;
 
+    /**
+     * Default constructor
+     */
     public Group() {
     }
 
-    public Group(int groupsId, String groupsName, char gender, String label, Date beginDate, Date disbandDate, boolean proposed) {
-        this.groupsId = groupsId;
-        this.groupsName = groupsName;
+    /**
+     * Constructor without disbandDate
+     *
+     * @param groupsId ID of the group
+     * @param groupsName Name of the group
+     * @param gender Gender of the group
+     */
+    public Group(int groupsId, String groupsName, String gender) {
+        this.groups_id = groupsId;
+        this.groups_name = groupsName;
         this.gender = gender;
-        this.label = label;
-        this.beginDate = beginDate;
-        this.disbandDate = disbandDate;
-        this.proposed = proposed;
+        this.proposed = true;
     }
 
-    public int getGroupsId() {
-        return groupsId;
+    /**
+     * Getters and Setters
+     */
+
+    public int getGroups_id() {
+        return groups_id;
+    }
+    public void setGroups_id(int groups_id) {
+        this.groups_id = groups_id;
     }
 
-    public void setGroupsId(int groupsId) {
-        this.groupsId = groupsId;
+    public String getGroups_name() {
+        return groups_name;
+    }
+    public void setGroups_name(String groups_name) {
+        this.groups_name = groups_name;
     }
 
-    public String getGroupsName() {
-        return groupsName;
-    }
-
-    public void setGroupsName(String groupsName) {
-        this.groupsName = groupsName;
-    }
-
-    public char getGender() {
+    public String getGender() {
         return gender;
     }
-
-    public void setGender(char gender) {
+    public void setGender(String gender) {
         this.gender = gender;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public Date getBeginDate() {
-        return beginDate;
-    }
-
-    public void setBeginDate(Date beginDate) {
-        this.beginDate = beginDate;
-    }
-
-    public Date getDisbandDate() {
-        return disbandDate;
-    }
-
-    public void setDisbandDate(Date disbandDate) {
-        this.disbandDate = disbandDate;
     }
 
     public boolean isProposed() {
         return proposed;
     }
-
     public void setProposed(boolean proposed) {
         this.proposed = proposed;
     }
 
+    /**
+     * Provides a string representation of the group.
+     *
+     * @return a string describing the group with all its attributes
+     */
     @Override
     public String toString() {
         return "Group{" +
-                "groupsId=" + groupsId +
-                ", groupsName='" + groupsName + '\'' +
-                ", gender=" + gender +
-                ", label='" + label + '\'' +
-                ", beginDate=" + beginDate +
-                ", disbandDate=" + disbandDate +
+                "groups_id=" + groups_id +
+                ", groups_name='" + groups_name + '\'' +
+                ", gender=" + gender + '\'' +
                 ", proposed=" + proposed +
                 '}';
     }
