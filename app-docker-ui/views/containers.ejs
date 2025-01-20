@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conteneurs Docker</title>
+    <link rel="stylesheet" href="/style.css">
+    <script>
+        async function handleAction(containerId, action) {
+            try {
+                const response = await fetch(`/containers/${action}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: containerId }),
+                });
+                const result = await response.json();
+                alert(result.message);
+                location.reload(); // Recharge la page pour mettre à jour les statuts
+            } catch (error) {
+                console.error(error);
+                alert("Erreur lors de l'action sur le conteneur.");
+            }
+        }
+    </script>
+</head>
+<body>
+<h1>Liste des conteneurs Docker</h1>
+<ul>
+    <% containers.forEach(container => { %>
+        <li>
+            Conteneur ID: <%= container.Id.substring(0, 6) %>,
+            Nom: <%= container.Names[0] %>,
+            Status: <%= container.Status %>
+            <%= container.State === 'running' ? '✅' : '❌' %>
+            <button onclick="handleAction('<%= container.Id %>', 'start')" <%= container.State === 'running' ? 'disabled' : '' %>>Start</button>
+            <button onclick="handleAction('<%= container.Id %>', 'stop')" <%= container.State !== 'running' ? 'disabled' : '' %>>Stop</button>
+        </li>
+    <% }) %>
+</ul>
+</body>
+</html>
