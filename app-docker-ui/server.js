@@ -15,7 +15,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Route pour afficher la liste des conteneurs
-app.get('/containers', (req, res) => {
+app.get('/', (req, res) => {
     docker.listContainers({ all: true }, (err, containers) => {
         if (err) {
             return res.status(500).send("Erreur lors de la récupération des conteneurs");
@@ -45,6 +45,40 @@ app.post('/containers/stop', (req, res) => {
             return res.status(500).json({ message: 'Erreur lors de l\'arrêt du conteneur.' });
         }
         res.json({ message: 'Conteneur arrêté avec succès.' });
+    });
+});
+
+// Route pour créer un conteneur
+app.post('/containers/create', async (req, res) => {
+    const { image, name } = req.body;
+
+    if (!image) {
+        return res.status(400).json({ message: "L'image est obligatoire pour créer un conteneur." });
+    }
+
+    try {
+        const container = await docker.createContainer({
+            Image: image,
+            name: name || undefined,
+            Tty: true,
+        });
+        res.json({ message: 'Conteneur créé avec succès.', id: container.id });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erreur lors de la création du conteneur.', error: error.message });
+    }
+});
+
+// Route pour supprimer un conteneur
+app.post('/containers/delete', (req, res) => {
+    const container = docker.getContainer(req.body.id);
+
+    container.remove({ force: true }, (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Erreur lors de la suppression du conteneur.' });
+        }
+        res.json({ message: 'Conteneur supprimé avec succès.' });
     });
 });
 

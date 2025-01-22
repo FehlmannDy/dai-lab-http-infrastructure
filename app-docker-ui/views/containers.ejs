@@ -21,21 +21,70 @@
                 alert("Erreur lors de l'action sur le conteneur.");
             }
         }
+
+        async function createContainer(event) {
+            event.preventDefault(); // Empêche le rechargement de la page
+            const form = event.target;
+            const image = form.image.value.trim();
+            const name = form.name.value.trim();
+
+            if (!image) {
+                alert("L'image est obligatoire !");
+                return;
+            }
+
+            try {
+                const response = await fetch('/containers/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image, name }),
+                });
+                const result = await response.json();
+                alert(result.message);
+                location.reload();
+            } catch (error) {
+                console.error(error);
+                alert("Erreur lors de la création du conteneur.");
+            }
+        }
     </script>
 </head>
 <body>
-<h1>Liste des conteneurs Docker</h1>
-<ul>
-    <% containers.forEach(container => { %>
-        <li>
-            Conteneur ID: <%= container.Id.substring(0, 6) %>,
-            Nom: <%= container.Names[0] %>,
-            Status: <%= container.Status %>
-            <%= container.State === 'running' ? '✅' : '❌' %>
-            <button onclick="handleAction('<%= container.Id %>', 'start')" <%= container.State === 'running' ? 'disabled' : '' %>>Start</button>
-            <button onclick="handleAction('<%= container.Id %>', 'stop')" <%= container.State !== 'running' ? 'disabled' : '' %>>Stop</button>
-        </li>
-    <% }) %>
-</ul>
+<h1>Gestion des conteneurs Docker 🐋</h1>
+
+<!-- Formulaire pour ajouter un conteneur -->
+<section>
+    <h2>Créer un nouveau conteneur</h2>
+    <form onsubmit="createContainer(event)">
+        <label for="image">Image Docker :</label>
+        <input type="text" id="image" name="image" placeholder="nginx:latest" required>
+        <br>
+        <label for="name">Nom du conteneur (optionnel) :</label>
+        <input type="text" id="name" name="name" placeholder="my-container">
+        <br>
+        <button type="submit">Créer</button>
+    </form>
+</section>
+
+<!-- Liste des conteneurs -->
+<section>
+    <h2>Liste des conteneurs</h2>
+    <div class="container">
+        <% containers.forEach(container => { %>
+            <div class="card">
+                <h2><%= container.Names[0].substring(1) %></h2>
+                <p>ID: <%= container.Id.substring(0, 6) %></p>
+                <p>Status: <%= container.Status %></p>
+                <p>Ports : <%= container.Ports[0].PrivatePort %></p>
+                <div class="status">
+                    <%= container.State === 'running' ? '✅ En cours d\'exécution' : '❌ Arrêté' %>
+                </div>
+                <button class="start-btn" onclick="handleAction('<%= container.Id %>', 'start')" <%= container.State === 'running' ? 'disabled' : '' %>>Démarrer</button>
+                <button class="stop-btn" onclick="handleAction('<%= container.Id %>', 'stop')" <%= container.State !== 'running' ? 'disabled' : '' %>>Arrêter</button>
+                <button class="delete-btn" onclick="handleAction('<%= container.Id %>', 'delete')">Supprimer</button>
+            </div>
+        <% }) %>
+    </div>
+</section>
 </body>
 </html>
