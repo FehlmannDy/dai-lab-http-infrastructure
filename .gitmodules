@@ -1,0 +1,7 @@
+[submodule "project-fehlmann_halimi_stelcher"]
+	path = project-fehlmann_halimi_stelcher
+	url = https://github.com/HEIGVD-202409-BDR-C/project-fehlmann_halimi_stelcher.git
+	branch = DAI-main
+[submodule "biasfinder-frontend"]
+	path = biasfinder-frontend
+	url = https://github.com/hliosone/biasfinder-frontend.git
