@@ -43,8 +43,12 @@ docker-compose down
 ```
 
 
-Step 3: HTTP API server
+HTTP API server
 ----------
+This report details the implementation of an HTTP API server built using Javalin. The API manages a collection of Photocards and provides CRUD (Create, Read, Update, Delete) operations. The API is integrated with a PostgreSQL database and is containerized using Docker for easy deployment.
+You will find the detailed description of the API server in the [app-dai/README.md]([app-dai/README.md) file.
+
+TO COMPLETE [app-dai/README.md]([app-dai/README.md) file.
 
 
 Step 4: Reverse proxy with Traefik
