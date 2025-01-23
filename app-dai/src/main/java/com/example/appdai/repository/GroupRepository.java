@@ -121,4 +121,43 @@ public class GroupRepository {
         }
     }
 
+    public void addGroup(Group group) {
+        String query = "INSERT INTO groups (groups_name,gender,proposed) VALUES (?, ?, ?)";
+        try {
+            jdbcTemplate.update(connection ->{
+                PreparedStatement stmt = connection.prepareStatement(query);
+                stmt.setString(1, group.getGroups_name());
+                stmt.setString(2, group.getGender());
+                stmt.setBoolean(3, true);
+                return stmt;
+            });
+        }catch (DataAccessException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+
+    public boolean validGroup(int groupId, boolean proposed){
+        if(proposed) {
+            String query = "UPDATE groups SET proposed = TRUE WHERE groups_id = ?";
+
+            try {
+                int updateRows = jdbcTemplate.update(query, groupId);
+                return updateRows > 0;
+            } catch (DataAccessException e) {
+                System.err.println("Erreur de la validité du group : " + e.getMessage());
+                return false;
+            }
+        }else{
+            String query = "DELETE official_sources WHERE id = ?";
+
+            try {
+                int updateRows = jdbcTemplate.update(query, groupId);
+                return updateRows > 0;
+            } catch (DataAccessException e) {
+                System.err.println("Erreur de la validité du group : " + e.getMessage());
+                return false;
+            }
+        }
+    }
 }
