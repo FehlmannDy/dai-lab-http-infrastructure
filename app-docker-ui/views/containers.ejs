@@ -75,7 +75,6 @@
                 <h2><%= container.Names[0].substring(1) %></h2>
                 <p>ID: <%= container.Id.substring(0, 6) %></p>
                 <p>Status: <%= container.Status %></p>
-                <p>Ports : <%= container.Ports[0].PrivatePort %></p>
                 <div class="status">
                     <%= container.State === 'running' ? '✅ En cours d\'exécution' : '❌ Arrêté' %>
                 </div>

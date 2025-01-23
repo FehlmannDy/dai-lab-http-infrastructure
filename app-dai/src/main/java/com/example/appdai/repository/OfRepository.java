@@ -106,14 +106,26 @@ public class OfRepository {
      * @return {@code true} if the update was successful, otherwise {@code false}.
      */
     public boolean validSource(int officialSourceId, boolean proposed){
-        String query = "UPDATE official_sources SET proposed = ? WHERE id = ?";
+        if(proposed) {
+            String query = "UPDATE official_sources SET proposed = TRUE WHERE id = ?";
 
-        try{
-            int updateRows = jdbcTemplate.update(query,proposed,officialSourceId);
-            return updateRows > 0;
-        }catch (DataAccessException e){
-            System.err.println("Erreur de la validité de l'official source : " + e.getMessage());
-            return false;
+            try {
+                int updateRows = jdbcTemplate.update(query, officialSourceId);
+                return updateRows > 0;
+            } catch (DataAccessException e) {
+                System.err.println("Erreur de la validité de l'official source : " + e.getMessage());
+                return false;
+            }
+        }else{
+            String query = "DELETE official_sources WHERE id = ?";
+
+            try {
+                int updateRows = jdbcTemplate.update(query, officialSourceId);
+                return updateRows > 0;
+            } catch (DataAccessException e) {
+                System.err.println("Erreur de la validité de l'official source : " + e.getMessage());
+                return false;
+            }
         }
     }
 
@@ -141,6 +153,4 @@ public class OfRepository {
             return List.of();
         }
     }
-
-    //TODO supprimer la source non valide
 }

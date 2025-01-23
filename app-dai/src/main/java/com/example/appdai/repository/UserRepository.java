@@ -154,6 +154,26 @@ public class UserRepository {
         }
     }
 
+    public User checkLogin(User user) {
+        if(user.getUsername() == null || user.getUsername().isEmpty() || user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Every field is required but shop name is optional");
+        }
+        String query = "SELECT * FROM users_photocard_list WHERE username = ? AND password = ?";
+        try{
+            jdbcTemplate.query(query,new Object[]{user.getUsername(),user.getPassword()},(rs, row)->{
+                User user1 = new User();
+                user1.setUser_id(rs.getInt("user_id"));
+                user1.setUsername(rs.getString("username"));
+                user1.setIs_admin(rs.getBoolean("is_admin"));
+                user1.setPassword(null);
+                return user1;
+            });
+        }catch (DataAccessException e) {
+            throw new RuntimeException("Error while checking username : " + e.getMessage());
+        }
+        return null;
+    }
+
 
     // --------------- ADMIN METHODS ---------------
 
