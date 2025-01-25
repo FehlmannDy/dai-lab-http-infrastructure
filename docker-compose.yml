@@ -1,152 +1,122 @@
-version: '3.9'
-
-name: dai-http-infrastructure
-
-networks:
-  biasbinder_network:
-    driver: bridge
+version: "3.9"
 
 services:
-  ################################################################
-  # TRAEFIK (reverse proxy en HTTP + dashboard)
-  ################################################################
+  ###################################################################
+  # TRAEFIK (Reverse Proxy)
+  ###################################################################
   reverse-proxy:
-    container_name: traefik
     image: traefik:v2.11
-    # On expose l'entrée HTTP (80) et le dashboard (8080)
+    container_name: traefik
     ports:
       - "80:80"
-      - "8080:8080"
+      - "8080:8080"  # Dashboard: http://localhost:8080
     command:
-      # Active le dashboard sur /:8080 (insecure = pas besoin de règle/label)
-      - "--api.dashboard=true"
       - "--api.insecure=true"
-
-      # Permet à Traefik de lire les labels Docker
+      - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-
-      # Déclare l'entrypoint "web" sur le port 80
       - "--entrypoints.web.address=:80"
-
-      # (Optionnel) Montre plus d'infos de debug si nécessaire
-      # - "--log.level=DEBUG"
     volumes:
-      # Traefik a besoin d'accéder à la socket Docker pour découvrir les services
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      # Retire (ou commente) tout montage de fichiers traefik.yml, tls.yml, certificates, etc.
-      # si tu n'en as pas besoin pour le moment :
-      # - "./traefik/traefik.yml:/etc/traefik/traefik.yml:ro"
     networks:
-      - biasbinder_network
+      - my_network
     labels:
-      # (Facultatif) On peut donner un nom au router qui sert le dashboard,
-      # mais comme on a '--api.insecure=true', le dashboard est déjà accessible
-      # directement sur http://localhost:8080
-      # Donc PAS besoin de labels pour le dashboard si "insecure=true".
-
-      # --------------------------------------------------------------------
-      # EXEMPLE: Si tu veux *quand même* accéder au dashboard via un host,
-      # comme traefik.localhost, alors :
-      #
-      # - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)"
-      # - "traefik.http.routers.dashboard.service=dashboard@internal"
-      # - "traefik.http.routers.dashboard.entrypoints=web"
-      #
-      # Et dans /etc/hosts tu ferais pointer traefik.localhost vers 127.0.0.1
-      # --------------------------------------------------------------------
       - "traefik.enable=true"
+      # Le dashboard sera sur http://localhost:8080, sans label supplémentaire
 
-  ################################################################
-  # SERVEUR STATIQUE (Nginx) - accessible via http://static.localhost
-  ################################################################
+  ###################################################################
+  # SITE STATIQUE (Nginx) sur "/"
+  ###################################################################
   static_server:
     build:
       context: ./static_server
       dockerfile: Dockerfile
-    # On n'expose pas de port à l'extérieur, Traefik y accède via le réseau interne
     expose:
       - "80"
     networks:
-      - biasbinder_network
+      - my_network
     labels:
       - "traefik.enable=true"
-      # Router basé sur le host "static.localhost"
-      # => tu devras ajouter dans ton /etc/hosts : 127.0.0.1 static.localhost
-      - "traefik.http.routers.static_server.rule=Host(`static.localhost`)"
-      - "traefik.http.routers.static_server.entrypoints=web"
-      # On indique que Nginx écoute sur le port 80 à l'intérieur du conteneur
-      - "traefik.http.services.static_server.loadbalancer.server.port=80"
+      # Route par défaut sur la racine
+      - "traefik.http.routers.static.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.static.entrypoints=web"
+      - "traefik.http.services.static.loadbalancer.server.port=80"
+      - "traefik.http.routers.static.priority=1"
 
-  ################################################################
-  # BASE DE DONNÉES PostgreSQL (pas exposée en HTTP)
-  ################################################################
-  db:
+  ###################################################################
+  # FRONTEND (React Dev Server) sur "/frontend"
+  ###################################################################
+  frontend:
     build:
-      context: ./project-fehlmann_halimi_stelcher
+      context: ./biasfinder-frontend
       dockerfile: Dockerfile
-    environment:
-      - POSTGRESQL_USERNAME=biasbinder_dev
-      - POSTGRESQL_PASSWORD=biasbinder
-      - POSTGRESQL_DATABASE=biasbinder_db
-    volumes:
-      - db_data:/var/lib/postgresql/data
+    expose:
+      - "5173"
     networks:
-      - biasbinder_network
-    # Pas de label traefik (ça ne sert pas une app HTTP)
+      - my_network
+    labels:
+      - "traefik.enable=true"
 
-  ################################################################
-  # BACKEND (Spring Boot + Javalin) - accessible via http://api.localhost
-  ################################################################
+      # On matche toutes les requêtes commençant par /frontend
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/frontend`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=5173"
+      - "traefik.http.routers.frontend.priority=2"
+
+      # On STRIP le préfixe "/frontend" pour que Vite reçoive tout en "/"
+      - "traefik.http.middlewares.strip-frontend.stripprefix.prefixes=/frontend"
+      - "traefik.http.routers.frontend.middlewares=strip-frontend"
+
+  ###################################################################
+  # API (Spring Boot + Javalin) sur "/api"
+  ###################################################################
   api:
     build:
       context: ./app-dai
       dockerfile: Dockerfile
+    expose:
+      - "7070"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/biasbinder_db?currentSchema=biasbinder_bst
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/biasbinder_db
       - SPRING_DATASOURCE_USERNAME=biasbinder_dev
       - SPRING_DATASOURCE_PASSWORD=biasbinder
     depends_on:
       - db
-    expose:
-      - "7070"  # Port interne où l'API écoute
     networks:
-      - biasbinder_network
+      - my_network
     labels:
       - "traefik.enable=true"
-      # On route tout ce qui a Host(api.localhost) sur l'entrypoint web
-      - "traefik.http.routers.api.rule=Host(`api.localhost`)"
+      - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
       - "traefik.http.routers.api.entrypoints=web"
       - "traefik.http.services.api.loadbalancer.server.port=7070"
+      - "traefik.http.routers.api.priority=3"
 
-      # Si tu veux CORS:
+      # Middleware CORS
       - "traefik.http.middlewares.api-cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,PATCH,OPTIONS"
       - "traefik.http.middlewares.api-cors.headers.accessControlAllowHeaders=Content-Type,Authorization"
       - "traefik.http.middlewares.api-cors.headers.accessControlAllowCredentials=true"
       - "traefik.http.middlewares.api-cors.headers.accessControlMaxAge=100"
       - "traefik.http.middlewares.api-cors.headers.addVaryHeader=true"
-      # Note la bonne clé : accessControlAllowOriginList (pas accessControlAllowOrigin)
       - "traefik.http.middlewares.api-cors.headers.accessControlAllowOriginList=*"
       - "traefik.http.routers.api.middlewares=api-cors"
 
-  ################################################################
-  # FRONTEND (React) - accessible via http://frontend.localhost
-  ################################################################
-  frontend:
-    build:
-      context: ./biasfinder-frontend
-      dockerfile: Dockerfile
-    depends_on:
-      - api
-    expose:
-      - "5173"
+  ###################################################################
+  # BASE DE DONNÉES (Postgres)
+  ###################################################################
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=biasbinder_dev
+      - POSTGRES_PASSWORD=biasbinder
+      - POSTGRES_DB=biasbinder_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
     networks:
-      - biasbinder_network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`frontend.localhost`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.services.frontend.loadbalancer.server.port=5173"
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
 
 volumes:
   db_data:
