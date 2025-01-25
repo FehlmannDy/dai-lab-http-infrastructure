@@ -2,14 +2,14 @@ version: "3.9"
 
 services:
   ###################################################################
-  # TRAEFIK (Reverse Proxy)
+  # REVERSE PROXY (Traefik)
   ###################################################################
   reverse-proxy:
     image: traefik:v2.11
     container_name: traefik
     ports:
-      - "80:80"
-      - "8080:8080"  # Dashboard: http://localhost:8080
+      - "80:80"      # HTTP sur localhost
+      - "8080:8080"  # Dashboard => http://localhost:8080
     command:
       - "--api.insecure=true"
       - "--api.dashboard=true"
@@ -22,62 +22,39 @@ services:
       - my_network
     labels:
       - "traefik.enable=true"
-      # Le dashboard sera sur http://localhost:8080, sans label supplémentaire
+      # Dashboard direct sur :8080, pas besoin d'autres labels
 
   ###################################################################
-  # SITE STATIQUE (Nginx) sur "/"
+  # SERVEUR STATIQUE (Nginx) sur la racine "/"
   ###################################################################
   static_server:
     build:
       context: ./static_server
       dockerfile: Dockerfile
     expose:
-      - "80"
+      - "80"  # interne
     networks:
       - my_network
     labels:
       - "traefik.enable=true"
-      # Route par défaut sur la racine
+      # Tout ce qui ne matche pas /api ira sur ce conteneur
       - "traefik.http.routers.static.rule=PathPrefix(`/`)"
       - "traefik.http.routers.static.entrypoints=web"
       - "traefik.http.services.static.loadbalancer.server.port=80"
+      # Priorité 1 (donc /api prime sur statique)
       - "traefik.http.routers.static.priority=1"
 
   ###################################################################
-  # FRONTEND (React Dev Server) sur "/frontend"
-  ###################################################################
-  frontend:
-    build:
-      context: ./biasfinder-frontend
-      dockerfile: Dockerfile
-    expose:
-      - "5173"
-    networks:
-      - my_network
-    labels:
-      - "traefik.enable=true"
-
-      # On matche toutes les requêtes commençant par /frontend
-      - "traefik.http.routers.frontend.rule=PathPrefix(`/frontend`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.services.frontend.loadbalancer.server.port=5173"
-      - "traefik.http.routers.frontend.priority=2"
-
-      # On STRIP le préfixe "/frontend" pour que Vite reçoive tout en "/"
-      - "traefik.http.middlewares.strip-frontend.stripprefix.prefixes=/frontend"
-      - "traefik.http.routers.frontend.middlewares=strip-frontend"
-
-  ###################################################################
-  # API (Spring Boot + Javalin) sur "/api"
+  # API (Spring Boot + Javalin), route "/api"
   ###################################################################
   api:
     build:
       context: ./app-dai
       dockerfile: Dockerfile
     expose:
-      - "7070"
+      - "7070"  # interne
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/biasbinder_db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/biasbinder_db?currentSchema=biasbinder_bst
       - SPRING_DATASOURCE_USERNAME=biasbinder_dev
       - SPRING_DATASOURCE_PASSWORD=biasbinder
     depends_on:
@@ -89,9 +66,9 @@ services:
       - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
       - "traefik.http.routers.api.entrypoints=web"
       - "traefik.http.services.api.loadbalancer.server.port=7070"
-      - "traefik.http.routers.api.priority=3"
+      - "traefik.http.routers.api.priority=2"
 
-      # Middleware CORS
+      # (Optionnel) Middleware CORS
       - "traefik.http.middlewares.api-cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,PATCH,OPTIONS"
       - "traefik.http.middlewares.api-cors.headers.accessControlAllowHeaders=Content-Type,Authorization"
       - "traefik.http.middlewares.api-cors.headers.accessControlAllowCredentials=true"
@@ -99,6 +76,20 @@ services:
       - "traefik.http.middlewares.api-cors.headers.addVaryHeader=true"
       - "traefik.http.middlewares.api-cors.headers.accessControlAllowOriginList=*"
       - "traefik.http.routers.api.middlewares=api-cors"
+
+  ###################################################################
+  # FRONTEND (React Dev Server) - Publie directement sur :5173
+  ###################################################################
+  frontend:
+    build:
+      context: ./biasfinder-frontend
+      dockerfile: Dockerfile
+    # Au lieu d'expose, on ouvre directement le port:
+    ports:
+      - "5173:5173"
+    networks:
+      - my_network
+    # AUCUN label Traefik => on ne passe pas par le reverse-proxy
 
   ###################################################################
   # BASE DE DONNÉES (Postgres)
@@ -113,6 +104,7 @@ services:
       - db_data:/var/lib/postgresql/data
     networks:
       - my_network
+    # Pas exposé en HTTP, donc pas de label Traefik
 
 networks:
   my_network:
