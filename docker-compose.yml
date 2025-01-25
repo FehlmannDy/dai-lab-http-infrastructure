@@ -1,136 +1,100 @@
-version: '3.9'
-
-name: dai-http-infrastructure
-
-networks:
-  biasbinder_network:
-    driver: bridge
+version: "3.9"
 
 services:
-  reverse-proxy:
-    container_name: traefik
+  ################################################################
+  # TRAEFIK (reverse proxy)
+  ################################################################
+  reverse_proxy:
     image: traefik:v2.11
+    container_name: traefik
     ports:
-      - "80:80"     # HTTP
-      - "443:443"   # HTTPS
-      - "8080:8080" # Traefik dashboard
+      - "80:80"     # Traefik écoute le traffic HTTP externe sur localhost
+      - "8080:8080" # Pour accéder au dashboard Traefik
     command:
-      - "--api.dashboard=true"                                        # Enable Traefik dashboard
-      - "--providers.docker=true"                                     # Enable Docker provider
-      - "--providers.docker.exposedbydefault=false"                   # Only expose services with explicit labels
-      - "--entrypoints.web.address=:80"                               # Define HTTP entrypoint
-      - "--entrypoints.websecure.address=:443"                        # Define HTTPS entrypoint
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      # Le dashboard en mode "insecure", accessible sur http://localhost:8080
+      - "--api.insecure=true"
+      - "--api.dashboard=true"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"        # Docker socket for Traefik to listen to Docker events
-      - "./traefik/traefik.yml:/etc/traefik/traefik.yml:ro"   # Traefik main configuration
-      - "./traefik/tls.yml:/etc/traefik/tls.yml:ro"           # TLS certificates configuration
-      - "./certificates:/etc/ssl/traefik"                     # TLS certificates
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
-      - biasbinder_network
-    labels:
-      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
-      # Middleware to redirect HTTP to HTTPS
-      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
-      - "traefik.http.routers.http_catchall.rule=HostRegexp(`{any:.+}`)"
-      - "traefik.http.routers.http_catchall.entrypoints=http"
-      - "traefik.http.routers.http_catchall.middlewares=https_redirect"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.traefik.me`)"
-      - "traefik.http.routers.dashboard.service=dashboard@internal"
-      - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.api.rule=Host(`traefik.traefik.me`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.api.service=api@internal"
-      - "traefik.http.routers.api.tls=true"
-      # CORS Middleware Labels
-      - "traefik.http.middlewares.api-cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,PATCH,OPTIONS"
-      - "traefik.http.middlewares.api-cors.headers.accessControlAllowHeaders=Content-Type,Authorization"
-      - "traefik.http.middlewares.api-cors.headers.accessControlAllowCredentials=true"
-      - "traefik.http.middlewares.api-cors.headers.accessControlMaxAge=100"
-      - "traefik.http.middlewares.api-cors.headers.addVaryHeader=true"
-      - "traefik.http.middlewares.api-cors.headers.accessControlAllowOrigin=https://frontend.traefik.me"
-      # Apply Middleware to Router
-      - "traefik.http.routers.api.middlewares=api-cors"
+      - my_network
 
-  static_server:
-    restart: unless-stopped
-    deploy:
-      replicas: 1
-    build:
-      context: ./static_server
-      dockerfile: Dockerfile
-    volumes:
-      - ./static_server/static_template:/usr/share/nginx/html:ro
-      - ./static_server/nginx_config/nginx.conf:/etc/nginx/nginx.conf:ro
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.static_server.rule=Host(`static.traefik.me`)"
-      - "traefik.http.services.static_server.loadbalancer.server.port=80" # default load balancing round-robin
-      - "traefik.http.routers.static_server.entrypoints=web,websecure"
-      - "traefik.http.routers.static_server-secure.tls=true"
-    networks:
-      - biasbinder_network
-
+  ################################################################
+  # POSTGRESQL
+  ################################################################
   db:
-    restart: unless-stopped
-    build:
-      #path to BDR submodule
-      context: ./project-fehlmann_halimi_stelcher
-      dockerfile: Dockerfile
+    image: postgres:15
+    # ou bien ton Dockerfile si tu as un Dockerfile personnalisé
     environment:
-      - POSTGRESQL_USERNAME=biasbinder_dev
-      - POSTGRESQL_PASSWORD=biasbinder
-      - POSTGRESQL_DATABASE=biasbinder_db
+      - POSTGRES_USER=biasbinder_dev
+      - POSTGRES_PASSWORD=biasbinder
+      - POSTGRES_DB=biasbinder_db
+    expose:
+      - "5432"  # accessible seulement dans le réseau docker
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
-      - biasbinder_network
+      - my_network
+    # Pas de labels traefik (pas besoin d'y accéder en HTTP)
 
+  ################################################################
+  # BACKEND (Spring Boot + Javalin)
+  ################################################################
   api:
-    restart: unless-stopped
-    deploy:
-        replicas: 1
     build:
       context: ./app-dai
       dockerfile: Dockerfile
+    # OU bien image: mon-registry/mon-backend:latest
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/biasbinder_db?currentSchema=biasbinder_bst
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/biasbinder_db
       - SPRING_DATASOURCE_USERNAME=biasbinder_dev
       - SPRING_DATASOURCE_PASSWORD=biasbinder
     depends_on:
       - db
+    expose:
+      - "7070"  # le port interne sur lequel l'API écoute
     networks:
-      - biasbinder_network
+      - my_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=Host(`api.traefik.me`)"
+      # Route qui match /api → on envoie au backend
+      - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.api.entrypoints=web"
       - "traefik.http.services.api.loadbalancer.server.port=7070"
-      # Sticky session configuration
-      - "traefik.http.services.api2.loadBalancer.sticky.cookie=true"
-      - "traefik.http.services.api2.loadBalancer.sticky.cookie.name=api"
-      # TLS configuration
-      - "traefik.http.routers.api-secure.tls=true"
-      - "traefik.http.routers.api.entrypoints=web,websecure"
-        # CORS Middleware Labels
-      - "traefik.http.routers.api.middlewares=cors"
+      # On monte la priorité pour que /api ne soit pas "caché" par la route /
+      - "traefik.http.routers.api.priority=2"
 
+      # (Facultatif) Si tu veux retirer "/api" avant que ça n'arrive à ton code:
+      # - "traefik.http.middlewares.strip-api.stripprefix.prefixes=/api"
+      # - "traefik.http.routers.api.middlewares=strip-api"
+
+  ################################################################
+  # FRONTEND (React)
+  ################################################################
   frontend:
-    restart: unless-stopped
     build:
-      # path to the FRONT submodule
-     context: ./biasfinder-frontend
-     dockerfile: Dockerfile
-    depends_on:
-      - api
+      context: ./biasfinder-frontend
+      dockerfile: Dockerfile
+    # depends_on si tu as besoin d'attendre que l'API soit ready
+    expose:
+      - "5173" # si ton serveur React local écoute sur 5173
     networks:
-      - biasbinder_network
+      - my_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`frontend.traefik.me`)"
-      - "traefik.http.routers.frontend.entrypoints=web,websecure"
-      # TLS configuration
-      - "traefik.http.routers.frontend.tls=true"
+      # Tout ce qui n'est pas /api ira ici, c-à-d PathPrefix("/")
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.services.frontend.loadbalancer.server.port=5173"
+      # On met une priority plus faible, pour que /api prenne le dessus quand c'est /api
+      - "traefik.http.routers.frontend.priority=1"
 
 volumes:
-    db_data:
+  db_data:
+
+networks:
+  my_network:
+    driver: bridge
