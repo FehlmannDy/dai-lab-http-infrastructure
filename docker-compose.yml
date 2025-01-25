@@ -48,6 +48,13 @@ services:
       - "traefik.http.routers.api.entrypoints=web"
       - "traefik.http.services.api.loadbalancer.server.port=7070"
       - "traefik.http.routers.api.priority=2"
+      - "traefik.http.services.api.loadBalancer.sticky.cookie=true"
+      - "traefik.http.services.api.loadBalancer.sticky.cookie.name=api"
+      # TLS configuration
+      - "traefik.http.routers.api-secure.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.api-secure.entrypoints=websecure"
+      - "traefik.http.routers.api-secure.tls=true"
+
 
     deploy:
       replicas: 2
@@ -88,6 +95,10 @@ services:
       - "traefik.http.routers.static.entrypoints=web"
       - "traefik.http.services.static.loadbalancer.server.port=80"
       - "traefik.http.routers.static.priority=1"
+      - "traefik.http.routers.static-secure.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.static-secure.entrypoints=websecure"
+      - "traefik.http.routers.static-secure.tls=true"
+
 
   ###################################################################
   # TRAEFIK (Reverse Proxy pour / et /api)
@@ -97,6 +108,7 @@ services:
     container_name: traefik
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080"
     command:
       - "--api.insecure=true"
