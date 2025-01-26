@@ -22,8 +22,16 @@ Docker compose
 The [docker-compose](docker-compose.yml) file can be found in the root of the project. It contains the configurations to deploy the different services of the project.
 
 The services are:
+- reverse-proxy
 - static_server
-- ...
+- db (PostgreSQL)
+- api (Springboot/Javalin)
+- front-end (React)
+
+To build the project:
+```
+docker-compose up -d --build 
+```
 
 Commands to run the project are:
 ```
@@ -31,24 +39,15 @@ docker-compose up
 
 ```
 
-To build the project:
-```
-docker-compose up -d --build 
-```
-
-
 To stop the project:
 ```
 docker-compose down
 ```
 
-
-HTTP API server
+Static Website
 ----------
-This report details the implementation of an HTTP API server built using Javalin. The API manages a collection of Photocards and provides CRUD (Create, Read, Update, Delete) operations. The API is integrated with a PostgreSQL database and is containerized using Docker for easy deployment.
-You will find the detailed description of the API server in the [app-dai/README.md]([app-dai/README.md) file.
+The docker image containing the static HTTP server nginx is in the [static_server](static_server) folder.
 
-TO COMPLETE [app-dai/README.md]([app-dai/README.md) file.
 
 Step 4: Reverse proxy with Traefik
 ----------

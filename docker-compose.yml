@@ -1,12 +1,130 @@
-version: '3.9'
+version: '3.8'
+
+networks:
+  biasbinder_network:
+    driver: bridge
+
+volumes:
+  db_data:
 
 services:
+  ###################################################################
+  # BASE DE DONNÉES PostgreSQL
+  ###################################################################
+  db:
+    build:
+      context: ./project-fehlmann_halimi_stelcher
+      dockerfile: Dockerfile
+    container_name: biasbinder_db_container
+    environment:
+      - POSTGRESQL_USERNAME=biasbinder_dev
+      - POSTGRESQL_PASSWORD=biasbinder
+      - POSTGRESQL_DATABASE=biasbinder_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - biasbinder_network
+
+  ###################################################################
+  # API (Spring Boot + Javalin) - HTTPS avec sticky sessions
+  ###################################################################
+  api:
+    build:
+      context: ./app-dai
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/biasbinder_db?currentSchema=biasbinder_bst
+      - SPRING_DATASOURCE_USERNAME=biasbinder_dev
+      - SPRING_DATASOURCE_PASSWORD=biasbinder
+    expose:
+      - "7070"
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - biasbinder_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.tls=true"
+      - "traefik.http.services.api.loadbalancer.server.port=7070"  # LIGNE AJOUTÉE
+      - "traefik.http.middlewares.api-cors.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,PATCH,OPTIONS"
+      - "traefik.http.middlewares.api-cors.headers.accessControlAllowHeaders=Content-Type,Authorization"
+      - "traefik.http.middlewares.api-cors.headers.accessControlAllowCredentials=true"
+      - "traefik.http.middlewares.api-cors.headers.accessControlMaxAge=100"
+      - "traefik.http.middlewares.api-cors.headers.addVaryHeader=true"
+      - "traefik.http.middlewares.api-cors.headers.accessControlAllowOriginList=https://localhost,http://localhost:5173"
+      - "traefik.http.routers.api.middlewares=api-cors"
+      - "traefik.http.services.api.loadBalancer.sticky.cookie=true"
+      - "traefik.http.services.api.loadBalancer.sticky.cookie.name=api-session"
+    deploy:
+      replicas: 2
+
+  ###################################################################
+  # FRONTEND (React) - Racine en HTTPS
+  ###################################################################
+  frontend:
+    build:
+      context: ./biasfinder-frontend
+      dockerfile: Dockerfile
+    container_name: biasbinder_frontend
+    expose:
+      - "5173"
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - biasbinder_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.services.frontend.loadbalancer.server.port=5173"
+      - "traefik.http.routers.frontend.priority=1"
+
+  ###################################################################
+  # SERVEUR STATIQUE (Nginx) - /static en HTTPS
+  ###################################################################
   static_server:
+    deploy:
+      replicas: 3
     build:
       context: ./static_server
       dockerfile: Dockerfile
+    expose:
+      - "80"
+    restart: unless-stopped
+    networks:
+      - biasbinder_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.static.rule=PathPrefix(`/static`)"
+      - "traefik.http.routers.static.entrypoints=websecure"
+      - "traefik.http.routers.static.tls=true"
+      - "traefik.http.services.static.loadbalancer.server.port=80"
+      - "traefik.http.routers.static.priority=2"
+
+  ###################################################################
+  # TRAEFIK (Reverse Proxy avec HTTPS)
+  ###################################################################
+  reverse-proxy:
+    image: traefik:v2.11
+    container_name: traefik
     ports:
-      - "8080:80"
+      - "80:80"       # Redirection HTTP → HTTPS
+      - "443:443"     # HTTPS
+      - "8080:8080"   # Dashboard
+    command:
+      - "--providers.file.filename=/etc/traefik/traefik.yml"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
     volumes:
-      - ./static_server/static_template:/usr/share/nginx/html:ro
-      - ./static_server/nginx_config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/traefik.yml:/etc/traefik/traefik.yml"
+      - "./traefik/certs:/etc/traefik/certs"
+    networks:
+      - biasbinder_network

@@ -1,0 +1,17 @@
+meta {
+  name: rejectProposedPhotocard
+  type: http
+  seq: 6
+}
+
+patch {
+  url: http://localhost:7070/api/admin/reject
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "photocardIds": [1, 2]
+  }
+}

@@ -1,0 +1,17 @@
+meta {
+  name: acceptProposedPhotocard
+  type: http
+  seq: 5
+}
+
+patch {
+  url: http://localhost:7070/api/admin/accept
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "photocardIds": [1, 2]
+  }
+}
