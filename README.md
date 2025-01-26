@@ -11,11 +11,20 @@ Introduction
 ----------
 TO COMPLETE : Add a summary of the project with the main goals and the technologies used from each step.
 
-Static Website
+Pre-requisites
 ----------
-The docker image containing the static HTTP server nginx is in the [static_server](static_server) folder.
+- Docker and Docker-compose installed on your machine
+- Git (with submodule support)
 
-A more detailed description of the website and of the configuration of the nginx server can be found in the [static_server/README.md](static_server/README.md) file.
+Make sure to clone the current repository recursively so you also get the BACK and FRONT submodules:
+```
+git clone --recurse-submodules <url>
+```
+
+If you already cloned without the --recurse-submodules, just run:
+```
+git submodule update --init --recursive
+```
 
 Docker compose
 ----------
@@ -49,26 +58,22 @@ Static Website
 The docker image containing the static HTTP server nginx is in the [static_server](static_server) folder.
 
 
-Step 4: Reverse proxy with Traefik
+Step 4, 5, 6, 7: Traefik
 ----------
-
-
-Step 5: Scalability and load balancing
-----------
-
-
-Step 6: Load balancing with round-robin and sticky sessions
-----------
-
-
-Step 7: Securing Traefik with HTTPS
-----------
-
+All the configurations for Traefik are in the [traefik/README.md](traefik/README.md) folder.
 
 
 Optional step 1: Management UI
 ------------------------------
-
+A COMPLETER
+You have documented how to use your solution.
 
 Optional step 2: Integration API - static Web site
 --------------------------------------------------
+For this step, we have integrated the dynamic server with the API. 
+
+We have added javascript code to the static website to fetch data from the API and display it on the website.
+
+The code can be found in the [biasfinder-frontend](biasfinder-frontend) folder.
+
+A COMPLETER metre un exemple de code
