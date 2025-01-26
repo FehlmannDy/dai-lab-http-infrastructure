@@ -65,8 +65,66 @@ All the configurations for Traefik are in the [traefik/README.md](traefik/README
 
 Optional step 1: Management UI
 ------------------------------
-A COMPLETER
-You have documented how to use your solution.
+
+![docker UI](images/app-docker-ui.png)
+
+### Build the Docker Image
+
+
+Navigate to the app-docker-ui/ and build the Docker image using Docker Compose.
+
+```
+docker-compose build
+```
+
+### Start the Application
+
+After the build is complete, start the application using the following command:
+
+```
+docker-compose up
+```
+
+### Access the Application
+
+Once the container is up and running, access the application by visiting:
+
+http://localhost:3000
+
+Now you can manage your containers
+
+
+Optional step 2: Integration API - static Web site
+--------------------------------------------------
+
+Home :
+
+    GET /api/groupslist: Retrieves the list of groups.
+    GET /api/groups/${groupId}/artists: Retrieves artists for the selected group.
+    GET /api/photocards?page=${page}&size=24: Retrieves photocards with pagination.
+    GET /api/users/${userId}/collection: Retrieves the user's owned and wishlist photocards.
+    POST /api/users/${userId}/photocards
+    DELETE /api/users/${userId}/photocards: Adds/removes photocards from the user's collection.
+    POST /api/user/photocard: Adds/removes photocard to/from the user's collection.
+
+Proposed Photocard :
+
+    GET /api/groupslist: Retrieves the list of groups.
+    GET /api/groups/${groupId}/artists: Retrieves artists for a specific group.
+    GET /api/groups/official-sources: Retrieves official sources for a group.
+    POST /api/photocards/proposecard: Proposes a photocard.
+    POST /api/officialsource/propose: Proposes an official source.
+
+User Profile :
+
+    GET /api/users/{userId}/collection: Retrieves the list of owned photocards.
+    GET /api/users/{userId}/wishlist: Retrieves the list of wishlist photocards.
+
+Admin Page:
+
+    GET /api/proposedphotocards: Retrieves the list of proposed photocards.
+    PATCH /api/admin/accept: Accepts the selected photocards.
+    DELETE /api/admin/reject: Rejects the selected photocards.
 
 Optional step 2: Integration API - static Web site
 --------------------------------------------------
@@ -76,4 +134,31 @@ We have added javascript code to the static website to fetch data from the API a
 
 The code can be found in the [biasfinder-frontend](biasfinder-frontend) folder.
 
-A COMPLETER metre un exemple de code
+Home :
+
+    GET /api/groupslist: Retrieves the list of groups.
+    GET /api/groups/${groupId}/artists: Retrieves artists for the selected group.
+    GET /api/photocards?page=${page}&size=24: Retrieves photocards with pagination.
+    GET /api/users/${userId}/collection: Retrieves the user's owned and wishlist photocards.
+    POST /api/users/${userId}/photocards
+    DELETE /api/users/${userId}/photocards: Adds/removes photocards from the user's collection.
+    POST /api/user/photocard: Adds/removes photocard to/from the user's collection.
+
+Proposed Photocard :
+
+    GET /api/groupslist: Retrieves the list of groups.
+    GET /api/groups/${groupId}/artists: Retrieves artists for a specific group.
+    GET /api/groups/official-sources: Retrieves official sources for a group.
+    POST /api/photocards/proposecard: Proposes a photocard.
+    POST /api/officialsource/propose: Proposes an official source.
+
+User Profile :
+
+    GET /api/users/{userId}/collection: Retrieves the list of owned photocards.
+    GET /api/users/{userId}/wishlist: Retrieves the list of wishlist photocards.
+
+Admin Page:
+
+    GET /api/proposedphotocards: Retrieves the list of proposed photocards.
+    PATCH /api/admin/accept: Accepts the selected photocards.
+    DELETE /api/admin/reject: Rejects the selected photocards.
