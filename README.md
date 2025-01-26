@@ -104,20 +104,29 @@ Optional step 2: Integration API - static Web site
 
 Home :
 
-    GET /api/groupslist: Fetches a list of groups for the filter.
-    GET /api/groups/{groupFilter}/artists: Fetches artists for a selected group, to filter by artist.
-    GET /api/photocards?page={page}&size={size}&groupId={groupFilter}&artistId={artistFilter}: Retrieves photocards based on pagination, group, and artist filters.
-    GET /api/users/{userId}/collection: Fetches the collection (wishlist/owned) of the current user.
-    POST /api/users/{userId}/photocards: Adds or removes a photocard to/from the user's collection (owned/wishlist).
-    POST /api/user/photocard: Adds/removes a photocard from the user's collection based on the action (have set to true for owned or false for wishlist).
+    GET /api/groupslist: Retrieves the list of groups.
+    GET /api/groups/${groupId}/artists: Retrieves artists for the selected group.
+    GET /api/photocards?page=${page}&size=24: Retrieves photocards with pagination.
+    GET /api/users/${userId}/collection: Retrieves the user's owned and wishlist photocards.
+    POST /api/users/${userId}/photocards
+    DELETE /api/users/${userId}/photocards: Adds/removes photocards from the user's collection.
+    POST /api/user/photocard: Adds/removes photocard to/from the user's collection.
+
+Proposed Photocard :
+
+    GET /api/groupslist: Retrieves the list of groups.
+    GET /api/groups/${groupId}/artists: Retrieves artists for a specific group.
+    GET /api/groups/official-sources: Retrieves official sources for a group.
+    POST /api/photocards/proposecard: Proposes a photocard.
+    POST /api/officialsource/propose: Proposes an official source.
 
 User Profile :
 
     GET /api/users/{userId}/collection: Retrieves the list of owned photocards.
     GET /api/users/{userId}/wishlist: Retrieves the list of wishlist photocards.
 
-Admin Page :
+Admin Page:
 
     GET /api/proposedphotocards: Retrieves the list of proposed photocards.
     PATCH /api/admin/accept: Accepts the selected photocards.
-    PATCH /api/admin/reject: Rejects the selected photocards.
+    DELETE /api/admin/reject: Rejects the selected photocards.
