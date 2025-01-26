@@ -1,23 +1,39 @@
 api:
   dashboard: true
+  insecure: true
 
 entryPoints:
   web:
     address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
   websecure:
     address: ":443"
 
 providers:
   docker:
-    endpoint: unix:///var/run/docker.sock
-    watch: true
-    exposedByDefault: true
-  file:
-    filename: /etc/traefik/tls.yml
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+
+http:
+  middlewares:
+    cors-headers:
+      headers:
+        accessControlAllowMethods:
+          - "GET"
+          - "POST"
+          - "PUT"
+          - "DELETE"
+        accessControlAllowOrigin: "https://localhost"  # Autorise le frontend HTTPS
+        accessControlAllowHeaders: "*"
+        accessControlAllowCredentials: true
 
 tls:
   stores:
     default:
       defaultCertificate:
-        certFile: /etc/ssl/traefik/cert.pem
-        keyFile: /etc/ssl/traefik/privkey.pem
+        certFile: /etc/traefik/certs/cert.pem
+        keyFile: /etc/traefik/certs/privkey.pem
