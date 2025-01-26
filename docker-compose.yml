@@ -48,6 +48,8 @@ services:
       - "traefik.http.routers.api.entrypoints=web"
       - "traefik.http.services.api.loadbalancer.server.port=7070"
       - "traefik.http.routers.api.priority=2"
+      - "traefik.http.services.api.loadBalancer.sticky.cookie=true"
+      - "traefik.http.services.api.loadBalancer.sticky.cookie.name=api-session"
 
     deploy:
       replicas: 2
