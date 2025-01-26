@@ -128,3 +128,19 @@ services:
       - "./traefik/certs:/etc/traefik/certs"
     networks:
       - biasbinder_network
+
+  app:
+    build:
+      context: ./app-docker-ui
+      dockerfile: Dockerfile
+    networks:
+      - biasbinder_network
+    container_name: app-docker-ui-interface
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      NODE_ENV: development
+    user: "root"
