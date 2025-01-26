@@ -71,6 +71,33 @@ Step 7: Securing Traefik with HTTPS
 Optional step 1: Management UI
 ------------------------------
 
+![docker UI](images/app-docker-ui.png)
+
+### Build the Docker Image
+
+
+Navigate to the app-docker-ui/ and build the Docker image using Docker Compose.
+
+```
+docker-compose build
+```
+
+### Start the Application
+
+After the build is complete, start the application using the following command:
+
+```
+docker-compose up
+```
+
+### Access the Application
+
+Once the container is up and running, access the application by visiting:
+
+http://localhost:3000
+
+Now you can manage your containers
+
 
 Optional step 2: Integration API - static Web site
 --------------------------------------------------
