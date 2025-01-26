@@ -101,3 +101,23 @@ Now you can manage your containers
 
 Optional step 2: Integration API - static Web site
 --------------------------------------------------
+
+Home :
+
+    GET /api/groupslist: Fetches a list of groups for the filter.
+    GET /api/groups/{groupFilter}/artists: Fetches artists for a selected group, to filter by artist.
+    GET /api/photocards?page={page}&size={size}&groupId={groupFilter}&artistId={artistFilter}: Retrieves photocards based on pagination, group, and artist filters.
+    GET /api/users/{userId}/collection: Fetches the collection (wishlist/owned) of the current user.
+    POST /api/users/{userId}/photocards: Adds or removes a photocard to/from the user's collection (owned/wishlist).
+    POST /api/user/photocard: Adds/removes a photocard from the user's collection based on the action (have set to true for owned or false for wishlist).
+
+User Profile :
+
+    GET /api/users/{userId}/collection: Retrieves the list of owned photocards.
+    GET /api/users/{userId}/wishlist: Retrieves the list of wishlist photocards.
+
+Admin Page :
+
+    GET /api/proposedphotocards: Retrieves the list of proposed photocards.
+    PATCH /api/admin/accept: Accepts the selected photocards.
+    PATCH /api/admin/reject: Rejects the selected photocards.
