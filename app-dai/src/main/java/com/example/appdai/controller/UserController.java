@@ -156,7 +156,7 @@ public class UserController {
         });
 
         // Reject proposed photocards
-        app.patch("/api/admin/reject", ctx -> {
+        app.delete("/api/admin/reject", ctx -> {
             Map<String, Object> body = ctx.bodyAsClass(Map.class);
             List<Integer> photocardIds = (List<Integer>) body.get("photocardIds");
 
